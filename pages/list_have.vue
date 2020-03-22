@@ -21,7 +21,6 @@
             :items="items"
             :items-per-page="50"
             class="elevation-1"
-            expand
             show-expand
             :search="search"
           >
@@ -31,7 +30,9 @@
             </template>
               
             <template v-slot:expanded-item="{ headers, item }">
-              <td :colspan="headers.length">{{ item.notes }}</td>
+              <td :colspan="headers.length">
+                {{ item.notes }}                
+              </td>
             </template>
 
           </v-data-table>
@@ -63,6 +64,13 @@
         { text: 'Quantity', value: 'quantity' },
         { text: 'Zip', value: 'zip' },
       ],
+      locations: [
+        {
+          'id': 1,
+          'lat': 40.098,
+          'long': -75.109
+        }
+      ]
     }),
     methods: {
 

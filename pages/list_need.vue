@@ -20,8 +20,7 @@
             :headers="headers"
             :items="items"
             :items-per-page="50"
-            class="elevation-1"
-            expand
+            class="elevation-1"         
             show-expand
             :search="search"
           >
@@ -43,6 +42,7 @@
 </template>
 
 <script>
+  import { GeoFirestore } from 'geofirestore'
 
   export default {
     data: () => ({

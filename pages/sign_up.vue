@@ -132,7 +132,7 @@
     },
     created () {
       console.log('created');
-      this.initForm();      
+      //this.initForm();      
     },
 
 

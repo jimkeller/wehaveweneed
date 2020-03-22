@@ -1,3 +1,9 @@
+<style>
+  form .v-subheader {
+    padding-left: 0;
+    padding-right: 0;
+  }
+</style>
 <template>
   <v-layout>
 
@@ -44,13 +50,36 @@
                 placeholder="79938"
               ></v-text-field>
 
-            <v-select
-              v-model="item"
-              :items="items"
-              :rules="[v => !!v || 'Item is required']"
-              label="What you need"
-              required
-            ></v-select>
+            <v-container>
+              <v-row>
+                <v-subheader> Choose an Item category and Item. You can also type in the item field.</v-subheader>
+              </v-row>
+              <v-row>
+
+                <v-select
+                  ref="item_category_select"
+                  v-model="item_category"
+                  :items="item_categories"
+                  :rules="[v => !!v || 'Item Category is required']"
+                  label="Item Category"
+                  required
+                  chips
+                  item-text='name'
+                  item-value='id'
+                ></v-select>
+
+                <v-combobox
+                  v-model="item"
+                  :items="filteredItems"
+                  :rules="[v => !!v || 'Item is required']"
+                  label="What you have"
+                  required
+                  chips
+                  item-text='name'
+                  item-value='name'              
+                ></v-combobox>
+              </v-row>
+            </v-container>
 
             <v-textarea
               v-model="notes"
@@ -96,10 +125,17 @@
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
       ],
       item: null,
-      items: ['PPE Equipment', 'Food', 'Need a strong taxonomy here'],
+      items: [],
       checkbox: false,
       lazy: false,
+      item_categories: [],
+      item_category: ''
     }),
+    computed: {
+      filteredItems() {
+        return this.items.filter(o =>  o.item_category_id == this.item_category);
+      }
+    },  
     methods: {
 
       handleFirebaseError(error) {
@@ -107,20 +143,74 @@
         this.dialog = true;
       },
       async initForm() {
-        // let result = await this.$fireStore.collection('available_items').get().catch( (error) => { this.handleFirebaseError(error) } );
-        // let snapshot = result.docs;
 
-        // snapshot.forEach(
-        //   function(doc) {
-        //     console.log( 'doc data ', doc.data() );
-        //   }
-        // );
+        //
+        // @TODO move this logic into a service/plugin
+        //
+
+        //
+        // Get item categories
+        //
+        let result = await this.$fireStore.collection('item_categories').get().catch( (error) => { this.handleFirebaseError(error) } );
+        let snapshot = result.docs;
+
+        snapshot.forEach(
+          (doc) => {
+            let data = doc.data();
+            data.id = doc.id;
+            this.item_categories.push( data );
+          }
+        );
+
+        //
+        // Get items
+        //
+        result = await this.$fireStore.collection('item_types').get().catch( (error) => { this.handleFirebaseError(error) } );
+        snapshot = result.docs;
+
+        snapshot.forEach(
+          (doc) => {
+           this.items.push( doc.data() );
+          }
+        );
       },
-
       async addNeed() {
         try {
           console.log('adding need');
+          //
+          // @TODO: this is very similar to the "have" form -- needs to be a service in the middle or something
+          // rather than duplicating this logic.
+          //
+
+          let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.item).get().catch( (error) => { this.handleFirebaseError(error) } );
+        
+          let type_snapshot = type_result.docs;
+
+          //
+          // This is a new item type, add it. 
+          //
+          if ( type_snapshot.length <= 0 ) {
+
+            const ref = this.$fireStore.collection("item_types").add(
+              {
+                name: this.item,
+                item_category_id: this.item_category
+              }
+            ).then (
+              () => {
+                console.log('item type added');
+              }
+            ).catch( 
+              (error) => {
+                this.handleFirebaseError( error );
+              }
+            );
+
+          }
           
+          //
+          // Now add the item
+          //
           const ref = this.$fireStore.collection("needed_items").add(
             {
               email: this.email,
@@ -158,7 +248,7 @@
     },
     created () {
       console.log('created');
-      //this.initForm();      
+      this.initForm();      
     },
 
 
