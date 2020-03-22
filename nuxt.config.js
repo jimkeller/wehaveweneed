@@ -1,6 +1,7 @@
 import colors from 'vuetify/es5/util/colors'
 
 export default {
+
   mode: 'universal',
   /*
   ** Headers of the page
@@ -11,7 +12,11 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
+      { hid: 'description', name: 'description', content: 'An application to help match people with emergency supplies to those with the need/demand for supplies' },
+      { hid: 'og:description', name: 'og:description', content: 'An application to help match people with emergency supplies to those with the need/demand for supplies' },
+      { hid: 'og:title', name: 'og:title', content: 'We Have / We Need' },
+      { hid: 'og:site_name', name: 'og:site_name', content: 'We Have / We Need' },
+
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -63,7 +68,12 @@ export default {
           firestore: true
         }
       }
-    ]
+    ],  
+    // ['nuxt-gmaps', {
+    //   key: 'AIzaSyANiHf3C8EswR7HWLENDuAVmxr06okgp6c',
+    //   //you can use libraries: ['places']
+    // }]
+  
   ],
   /*
   ** Axios module configuration
@@ -101,5 +111,5 @@ export default {
     */
     extend (config, ctx) {
     }
-  }
+  },
 }
