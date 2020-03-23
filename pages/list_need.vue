@@ -28,13 +28,13 @@
           <template v-slot:top>
             <v-text-field v-model="search" label="Search" class="mx-4"></v-text-field>
           </template>
-            
+
           <template v-slot:expanded-item="{ headers, item }">
             <td :colspan="headers.length">{{ item.notes }}</td>
           </template>
 
           </v-data-table>
-         
+
         </v-col>
       </v-row>
     </v-container>
@@ -50,7 +50,7 @@
       dialog: false,
       message: '',
       search: '',
-      items: [],      
+      items: [],
       headers: [
         {
           text: 'Item Name',
@@ -75,12 +75,12 @@
         let snapshot = result.docs;
 
         snapshot.forEach(
-          (doc) => { 
+          (doc) => {
             this.items.push( doc.data() );
           }
         );
       },
-     
+
     },
     created () {
       console.log('created');

@@ -25,7 +25,7 @@
          <v-form
             ref="form"
             v-model="valid"
-            :lazy-validation="lazy"            
+            :lazy-validation="lazy"
           >
             <v-text-field
               v-model="name"
@@ -44,10 +44,9 @@
             <v-text-field
                 ref="zip"
                 v-model="zip"
-                :rules="[() => !!zip || 'This field is required']"
+                :rules="zipRules"
                 label="ZIP / Postal Code"
                 required
-                placeholder="79938"
               ></v-text-field>
 
             <v-text-field
@@ -85,7 +84,7 @@
                   required
                   chips
                   item-text='name'
-                  item-value='name'              
+                  item-value='name'
                 ></v-combobox>
               </v-row>
             </v-container>
@@ -115,6 +114,9 @@
 
 <script>
 
+  import { GeoFirestore } from 'geofirestore'
+  import * as zipcodes from 'zipcodes'
+
   export default {
     data: () => ({
       valid: true,
@@ -125,12 +127,16 @@
       quantity: 1,
       notes: '',
       nameRules: [
-        v => !!v || 'Name is required'        
+        v => !!v || 'Name is required'
       ],
       email: '',
       emailRules: [
         v => !!v || 'E-mail is required',
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+      ],
+      zipRules:[
+        v => !!v || 'Zip code is required',
+        v => !!zipcodes.lookup(v) || 'Zip code must be valid',
       ],
       item: null,
       item_category: '',
@@ -143,7 +149,7 @@
       filteredItems() {
         return this.items.filter(o =>  o.item_category_id == this.item_category);
       }
-    },    
+    },
     methods: {
 
       handleFirebaseError(error) {
@@ -193,11 +199,11 @@
           //
 
           let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.item).get().catch( (error) => { this.handleFirebaseError(error) } );
-        
+
           let type_snapshot = type_result.docs;
 
           //
-          // This is a new item type, add it. 
+          // This is a new item type, add it.
           //
           if ( type_snapshot.length <= 0 ) {
 
@@ -210,29 +216,37 @@
               () => {
                 console.log('item type added');
               }
-            ).catch( 
+            ).catch(
               (error) => {
                 this.handleFirebaseError( error );
               }
             );
 
           }
-          
-          const ref = this.$fireStore.collection("available_items").add(
+
+          // Create a GeoFirestore reference
+          const geoFirestore = new GeoFirestore(this.$fireStore);
+          // Create a GeoCollection reference
+          const geoCollection = geoFirestore.collection("available_items");
+          //const ref = this.$fireStore.collection("available_items").add(
+          const zipInfo = zipcodes.lookup(this.zip);
+
+          const ref = geoCollection.add(
             {
               email: this.email,
               zip: this.zip,
               name: this.name,
               notes: this.notes,
               quantity: this.quantity,
-              item: this.item
+              item: this.item,
+              coordinates: new this.$fireStoreObj.GeoPoint(zipInfo.latitude, zipInfo.longitude)
             }
           ).then (
             (doc_ref) => {
               this.message = 'Added successfully. Your reference ID is: ' + doc_ref.id.toString();
               this.dialog = true;
             }
-          ).catch( 
+          ).catch(
             (error) => {
               this.handleFirebaseError( error );
             }
@@ -253,8 +267,9 @@
         this.$refs.form.resetValidation()
       },
     },
-    created () {      
-      this.initForm();      
+
+    created () {
+      this.initForm();
     },
 
 
