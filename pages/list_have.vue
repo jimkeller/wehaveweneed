@@ -19,6 +19,7 @@
             :items="items"
             :items-per-page="50"
             class="elevation-1"
+            item-key="id"
             show-expand
             :search="search"
           >
@@ -152,8 +153,9 @@ import * as zipcodes from 'zipcodes'
       let snapshot = result.docs
 
       snapshot.forEach(doc => {
-        console.log(doc.data());
-        this.items.push(doc.data())
+        const data = doc.data();
+        data.id = doc.id;
+        this.items.push(data);
       })
     },
 
