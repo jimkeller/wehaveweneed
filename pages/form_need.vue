@@ -221,7 +221,6 @@
           const geoCollection = geoFirestore.collection("available_items");
 
           const zipInfo = zipcodes.lookup(this.zip);
-          console.log(this.item);
           const ref = geoCollection.add(
             {
               email: this.email,

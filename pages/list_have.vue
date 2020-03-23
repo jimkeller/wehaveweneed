@@ -40,12 +40,15 @@
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
-                    <v-text-field
+                    <v-select
                       ref="dist"
                       v-model="dist"
+                      :items="[5, 10, 15, 20, 50]"
                       :rules="distRules"
-                      label="Distance"
-                    ></v-text-field>
+                      label="Max Distance (mi)"                    
+                    >
+                      
+                    </v-select>
                   </v-col>
                   <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
                     <v-btn
