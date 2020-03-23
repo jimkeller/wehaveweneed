@@ -72,7 +72,7 @@
                   v-model="item"
                   :items="filteredItems"
                   :rules="[v => !!v || 'Item is required']"
-                  label="What you have"
+                  v-bind:label="this.itemFieldLabel"
                   required
                   chips
                   item-text='name'
@@ -111,7 +111,7 @@
   import * as zipcodes from 'zipcodes'
 
   export default {
-    props: ['dataSource'],
+    props: ['dataSource', 'itemFieldLabel'],
     data: () => ({
       valid: true,
       dialog: false,

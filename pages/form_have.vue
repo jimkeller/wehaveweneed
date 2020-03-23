@@ -1,5 +1,5 @@
 <template>
-  <Form dataSource='available_items'/>
+  <Form data-source='available_items' item-field-label="What you Have"/>
 </template>
 
 <script>
