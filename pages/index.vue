@@ -70,7 +70,7 @@
               This is not at all feature complete, but can be rapidly improved. It was created by <a href="http://www.github.com/jimkeller">Jim Keller</a> of <a href="https://www.easternstandard.com">Eastern Standard</a>. 
             </p>
             <p>
-              It is written in Vue.js with Vuetify, and is <a href="https://github.com/jimkeller/wehaveweneed">available on github</a>
+              It is written in Vue.js with Nutxt and Vuetify, and is <a href="https://github.com/jimkeller/wehaveweneed">available on github</a>
             </p>
             <p>
               If you can help, please get in touch on the <a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a>
@@ -114,6 +114,18 @@
             </ul>
           </v-card-text>
         </v-card>
+        <v-card>
+          <v-card-title>Contact</v-card-title>
+          <v-card-text>
+            <p>
+              Right now the best place to find us is the <a href="https://join.slack.com/t/codevid-19/shared_invite/zt-cs8amank-jg7vUQeSUgX7K9cM9WZMfQ">codevid-19 slack channel</a>
+            </p>
+            <p>
+              You can contact Jim directly at jimk - at - easternstandard.com
+            </p>          
+          </v-card-text>
+        </v-card>
+
       </v-col>
     </v-row>
   </v-container>
