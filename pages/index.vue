@@ -103,6 +103,18 @@
           </v-card-text>
         </v-card>
         <v-card>
+          <v-card-title>Collaborators</v-card-title>
+          <v-card-text>
+            The following people have contribued to this project:
+            <ul>
+              <li><a target="_new" href="https://github.com/jimkeller">Jim Keller</a></li>
+              <li>Stoytcho Stoytchev</li>
+              <li><a target="_new" href="https://github.com/chen-robert">Robert Chen</a></li>
+              <li>@Victoria from the codevid-19 slack channel</li>
+            </ul>
+          </v-card-text>
+        </v-card>
+        <v-card>
           <v-card-title>Resources</v-card-title>
           <v-card-text>
 
