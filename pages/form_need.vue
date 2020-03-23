@@ -44,7 +44,7 @@
             <v-text-field
                 ref="zip"
                 v-model="zip"
-                :rules="[() => !!zip || 'This field is required']"
+                :rules="zipRules"
                 label="ZIP / Postal Code"
                 required
                 placeholder="79938"
@@ -107,6 +107,9 @@
 
 <script>
 
+  import { GeoFirestore } from 'geofirestore'
+  import * as zipcodes from 'zipcodes'
+
   export default {
     data: () => ({
       valid: true,
@@ -124,6 +127,10 @@
         v => !!v || 'E-mail is required',
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
       ],
+      zipRules:[
+        v => !!v || 'Zip code is required',
+        v => !!zipcodes.lookup(v) || 'Zip code must be valid',
+      ],    
       item: null,
       items: [],
       checkbox: false,
@@ -208,24 +215,29 @@
 
           }
           
-          //
-          // Now add the item
-          //
-          const ref = this.$fireStore.collection("needed_items").add(
+          // Create a GeoFirestore reference
+          const geoFirestore = new GeoFirestore(this.$fireStore);
+          // Create a GeoCollection reference
+          const geoCollection = geoFirestore.collection("available_items");
+
+          const zipInfo = zipcodes.lookup(this.zip);
+          console.log(this.item);
+          const ref = geoCollection.add(
             {
               email: this.email,
               zip: this.zip,
               name: this.name,
               notes: this.notes,
               quantity: this.quantity,
-              item: this.item
+              item: this.item.name, //for now we only store the name
+              coordinates: new this.$fireStoreObj.GeoPoint(zipInfo.latitude, zipInfo.longitude)
             }
           ).then (
             (doc_ref) => {
               this.message = 'Added successfully. Your reference ID is: ' + doc_ref.id.toString();
               this.dialog = true;
             }
-          ).catch( 
+          ).catch(
             (error) => {
               this.handleFirebaseError( error );
             }
