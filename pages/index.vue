@@ -91,7 +91,7 @@
             </ul>
             <br>
             <p>We would love your help too! Please get in touch on the <a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a>, or through <a href="https://github.com/jimkeller/wehaveweneed">our Github repository</a>!
-            </p></p>
+            </p>
           </v-card-text>
         </v-card>
         <v-card>
