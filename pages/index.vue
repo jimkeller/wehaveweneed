@@ -1,3 +1,13 @@
+<style scoped>
+  .v-parallax {
+    font-size: 2em;
+  }
+
+  .v-card {
+    margin-bottom: 25px;
+  }
+</style>
+
 <template>
   <v-container>
     <v-row
@@ -17,15 +27,15 @@
             justify="center"
           >
             <v-col class="text-center" cols="12">
-              <h1 class="display-1 font-weight-thin mb-4">We Have / We Need</h1>
-              <h4 class="subheader">Matching people with emergency supplies to the people who need them</h4>
+              <h1 class="display-1 mb-4">WeHave / WeNeed</h1>
+              <h4 class="subheader ">Getting supplies to the people who need them</h4>
             </v-col>
           </v-row>
         </v-parallax>
       </v-col>
     </v-row>
     <v-row>
-      <v-col justify-center>
+      <v-col justify-center align="center">
         <v-btn
           x-large
           color="primary"
@@ -63,55 +73,25 @@
     <v-row>
       <v-col>
         <v-card>
-          <v-card-title>Introduction</v-card-title>
+          <v-card-title>Vision</v-card-title>
           <v-card-text>
-            <p>This is a <strong>prototype</strong> application to help match people who have or can make critical items with people who need those items.</p>
-            <p>
-              This is not at all feature complete, but can be rapidly improved. It was created by <a href="http://www.github.com/jimkeller">Jim Keller</a> of <a href="https://www.easternstandard.com">Eastern Standard</a>. 
-            </p>
-            <p>
-              It is written in Vue.js with Nutxt and Vuetify, and is <a href="https://github.com/jimkeller/wehaveweneed">available on github</a>
-            </p>
-            <p>
-              If you can help, please get in touch on the <a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a>
-            </p>
-          </v-card-text>
-        </v-card>
-        <v-card>
-          <v-card-title>Initial use-case</v-card-title>
-          <v-card-text>
-
-            <ul>
-              <li>User creates a post, either a "have" or a "need"</li>
-              <li>They include notes about how to contact them (ideally we'd be able to have email anonymizing like CL, but we're in a rush here)</li>
-              <li>They receive a custom link that allows them to manage their post</li>
-              <li>Someone can respond to them by email or however they've asked to be contacted</li>
-              <li>The original poster can use their unique link to set the status of the request to "in progress" or something
-    Once things are complete, or if it falls through, original poster can either close the request or set status to open</li>
-            </ul>
-          </v-card-text>
-        </v-card>
-        <v-card>
-          <v-card-title>Critical Features</v-card-title>
-          <v-card-text>
-            <ul>
-              <li>A taxonomy of the types of items that may be needed. (in progress, thanks to @Victoria from the <a href="https://codevid19.com/">codevid-19</a> slack)</li>
-              <li>Ability to search by geographic distance (in progress, thanks to Stoytcho Stoytchev)</li>
-              <li>Ability to login to manage your submissions (in progress)</li>
-              <li>Inclusion of Non-US addresses</li>
-            </ul>
+            <p>Our goal is to help match people who have or can make critical items with people who need those items.</p>
+            <p>Users are able to create a posts, either a "have" or a "need". We will then connect them with the right people to fulfill their request.</p>
           </v-card-text>
         </v-card>
         <v-card>
           <v-card-title>Collaborators</v-card-title>
           <v-card-text>
-            The following people have contribued to this project:
+            The following people have contributed to this project:
             <ul>
               <li><a target="_new" href="https://github.com/jimkeller">Jim Keller</a></li>
               <li>Stoytcho Stoytchev</li>
               <li><a target="_new" href="https://github.com/chen-robert">Robert Chen</a></li>
               <li>@Victoria from the codevid-19 slack channel</li>
             </ul>
+            <br>
+            <p>We would love your help too! Please get in touch on the <a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a>, or through <a href="https://github.com/jimkeller/wehaveweneed">our Github repository</a>!
+            </p>
           </v-card-text>
         </v-card>
         <v-card>
