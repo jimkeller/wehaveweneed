@@ -111,9 +111,8 @@
   import * as zipcodes from 'zipcodes'
 
   export default {
-
+    props: ['dataSource'],
     data: () => ({
-      props: ['dataSource'],
       valid: true,
       dialog: false,
       message: '',
@@ -152,7 +151,6 @@
         this.dialog = true;
       },
       async initForm() {
-
         //
         // @TODO move this logic into a service/plugin
         //
