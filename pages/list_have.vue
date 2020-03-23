@@ -155,7 +155,6 @@ import * as zipcodes from 'zipcodes'
       snapshot.forEach(doc => {
         const data = doc.data();
         data.id = doc.id;
-        console.log(data);
         this.items.push(data);
       })
     },
