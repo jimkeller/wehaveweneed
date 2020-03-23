@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app wehaveweneed>
 
     <v-navigation-drawer
       v-model="drawer"
@@ -30,9 +30,10 @@
       :clipped-left="clipped"
       fixed
       app
-      class="shrink">
+      class="shrink light-blue darken-4 white--text"
+      >
 
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon dark @click.stop="drawer = !drawer" />
 
       <v-toolbar-title>
         <router-link to="/" tag="span" style="cursor: pointer">
@@ -43,11 +44,12 @@
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-xs-only">
         <v-btn
+          class="white--text"
           text
           v-for="item in menuItems"
           :key="item.title"
           :to="item.path">
-          <v-icon left dark>mdi-{{ item.icon }}</v-icon>
+          <!-- <v-icon left dark>mdi-{{ item.icon }}</v-icon> -->          
           {{ item.title }}
         </v-btn>
       </v-toolbar-items>
