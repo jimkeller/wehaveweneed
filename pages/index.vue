@@ -1,83 +1,103 @@
 <template>
-  <v-layout
-    column
-    justify-center
-    align-center
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
+  <v-container>
+    <v-row
+      column
+      justify-center
+      align-center
     >
-      <div class="text-center">
-      </div>
-      <v-card>
-        <v-card-title class="headline">
-          We Have / We Need
-        </v-card-title>
-        <v-card-text>
-          <v-img src="~/assets/logo.svg" />
-          <p>This is a <strong>prototype</strong> application to help match people who have or can make critical items with people who need those items.</p>
-          <p>
-            This is not at all feature complete, but can be rapidly improved. It was created by <a href="http://www.github.com/jimkeller">Jim Keller</a> of <a href="https://www.easternstandard.com">Eastern Standard</a>. 
-          </p>
-          <p>
-            The most critical features for this to be viable are:
-          </p>
-          <ul>
-            <li>A strong taxonomy of the types of items that may be needed.</li>
-            <li>Ability to search by geographic distance</li>
-            <li>Ability to login to manage your submissions (in progress)</li>
-            <li>Inclusion of Non-US addresses</li>
-          </ul>
-          <p>
-            It is written in Vue.js with Vuetify, and is <a href="https://github.com/jimkeller/wehaveweneed">available on github</a>
-          <p>
-            If you can help, please get in touch on the <a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a>
-          </p>
-          <p>
-            Resources:            
-          </p>
-          <ul>
-            <li><a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a></li>
-          </ul>
-        </v-card-text>
+      <v-col
 
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            nuxt
-            to="/form_have"
+      >
+        <v-parallax
+          dark
+          src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
+        >
+          <v-row
+            align="center"
+            justify="center"
           >
-            I have something
-          </v-btn>
-          <v-btn
-            color="primary"
-            nuxt
-            to="/form_need"
-          >
-            I need something
-          </v-btn>
-          <v-btn
-            color="primary"
-            nuxt
-            to="/list_have"
-          >
-            See available items
-          </v-btn>
-          <v-btn
-            color="primary"
-            nuxt
-            to="/list_need"
-          >
-            See needed items
-          </v-btn>
+            <v-col class="text-center" cols="12">
+              <h1 class="display-1 font-weight-thin mb-4">We Have / We Need</h1>
+              <h4 class="subheading">Matching people with emergency supplies to the people who need them</h4>
+            </v-col>
+          </v-row>
+        </v-parallax>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col justify-center>
+        <v-btn
+          x-large
+          color="primary"
+          nuxt
+          to="/form_have"
+        >
+          I have something
+        </v-btn>
+        <v-btn
+          x-large
+          color="primary"
+          nuxt
+          to="/form_need"
+        >
+          I need something
+        </v-btn>
+        <v-btn
+          x-large
+          color="primary"
+          nuxt
+          to="/list_have"
+        >
+          See available items
+        </v-btn>
+        <v-btn
+          x-large
+          color="primary"
+          nuxt
+          to="/list_need"
+        >
+          See needed items
+        </v-btn>
+      </v-col>
+    </v-row>
+        <v-card>
 
-        </v-card-actions>
+          <v-card-text>
+            <v-img src="~/assets/logo.svg" />
+            <p>This is a <strong>prototype</strong> application to help match people who have or can make critical items with people who need those items.</p>
+            <p>
+              This is not at all feature complete, but can be rapidly improved. It was created by <a href="http://www.github.com/jimkeller">Jim Keller</a> of <a href="https://www.easternstandard.com">Eastern Standard</a>. 
+            </p>
+            <p>
+              The most critical features for this to be viable are:
+            </p>
+            <ul>
+              <li>A taxonomy of the types of items that may be needed. (in progress, thanks to @Victoria from the <a href="https://codevid19.com/">codevid-19</a> slack)</li>
+              <li>Ability to search by geographic distance (in progress, thanks to Stoytcho Stoytchev)</li>
+              <li>Ability to login to manage your submissions (in progress)</li>
+              <li>Inclusion of Non-US addresses</li>
+            </ul>
+            <p></p>
+            <p>
+              It is written in Vue.js with Vuetify, and is <a href="https://github.com/jimkeller/wehaveweneed">available on github</a>
+            <p>
+              If you can help, please get in touch on the <a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a>
+            </p>
+            <p>
+              Resources:            
+            </p>
+            <ul>
+              <li><a href="https://codevid19.com/">codevid-19</a> hackathon. We are currently collaborating on their <a href="https://join.slack.com/t/codevid-19/shared_invite/zt-cs8amank-jg7vUQeSUgX7K9cM9WZMfQ">slack channel</a></li>
+              <li><a href="https://findcollabs.com/project/we-have--we-need-jwVHerxuEp46MGdorreI">We Have / We Need on FindCollabs</a></li>
+              <li><a href="https://www.facebook.com/groups/opensourcecovid19medicalsupplies/">Open Source COVID19 on Facebook</a></li>
+              <li><a href="https://docs.google.com/spreadsheets/d/1txEanDkIrJ5GNfSk-zlXkTlB-bQPNRN_Y69qEwmdme8/htmlview?sle=true&fbclid=IwAR3GmEtt-uTY6YX91DO3tmQ7MPFecETahZSDt_Z0f1UmNJuGfIOw8kqPu4c">Google sheet</a> where folks have consolidated the kind of information this app aims to propagate.</li>
+            </ul>
+          </v-card-text>
 
-      </v-card>
-    </v-flex>
-  </v-layout>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
