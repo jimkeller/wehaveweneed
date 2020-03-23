@@ -129,7 +129,7 @@ import * as zipcodes from 'zipcodes'
         'available_items'
       )
       const zipInfo = zipcodes.lookup(this.zip)
-      const result = this.zip //if there's a zipcode, filter on the distance
+      const result = this.zip //if there's a zip code, filter on the distance
         ? await geoCollection
             .near({
               center: new this.$fireStoreObj.GeoPoint(
@@ -152,6 +152,7 @@ import * as zipcodes from 'zipcodes'
       let snapshot = result.docs
 
       snapshot.forEach(doc => {
+        console.log(doc.data());
         this.items.push(doc.data())
       })
     },

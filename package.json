@@ -18,8 +18,8 @@
     "firebase": "^7.12.0",
     "geofirestore": "^3.4.1",
     "nuxt": "^2.0.0",
-    "nuxt-gmaps": "^1.1.9"
-    "zipcodes": "^8.0.0",
+    "nuxt-gmaps": "^1.1.9",
+    "zipcodes": "^8.0.0"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.0.0",

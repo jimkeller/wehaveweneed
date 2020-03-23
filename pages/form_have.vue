@@ -172,7 +172,7 @@
           (doc) => {
             let data = doc.data();
             data.id = doc.id;
-            this.item_categories.push( data );
+            this.item_categories.push(data);
           }
         );
 
@@ -184,6 +184,7 @@
 
         snapshot.forEach(
           (doc) => {
+            console.log(doc.data());
            this.items.push( doc.data() );
           }
         );
@@ -228,9 +229,9 @@
           const geoFirestore = new GeoFirestore(this.$fireStore);
           // Create a GeoCollection reference
           const geoCollection = geoFirestore.collection("available_items");
-          //const ref = this.$fireStore.collection("available_items").add(
-          const zipInfo = zipcodes.lookup(this.zip);
 
+          const zipInfo = zipcodes.lookup(this.zip);
+          console.log(this.item);
           const ref = geoCollection.add(
             {
               email: this.email,
@@ -238,7 +239,7 @@
               name: this.name,
               notes: this.notes,
               quantity: this.quantity,
-              item: this.item,
+              item: this.item.name, //for now we only store the name
               coordinates: new this.$fireStoreObj.GeoPoint(zipInfo.latitude, zipInfo.longitude)
             }
           ).then (
