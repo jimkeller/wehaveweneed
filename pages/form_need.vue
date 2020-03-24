@@ -1,5 +1,5 @@
 <template>
-  <Form data-source='needed_items' item-field-label="What you Need"/>
+  <Form data-source='needed_items' post-type="need" item-field-label="What you Need"/>
 </template>
 
 <script>

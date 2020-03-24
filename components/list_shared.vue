@@ -108,6 +108,7 @@ import * as zipcodes from 'zipcodes'
         { text: 'Email', value: 'email' },
         { text: 'Quantity', value: 'quantity' },
         { text: 'Zip', value: 'zip' },
+        { text: 'Status', value: 'status' },
       ],
       locations: [
         {

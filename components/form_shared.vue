@@ -7,13 +7,26 @@
 <template>
   <v-layout>
 
-    <v-dialog v-model="dialog" persistent max-width="290">
+    <v-dialog v-model="dialog" persistent max-width="400">
       <v-card>
         <v-card-title class="headline">Message</v-card-title>
         <v-card-text>{{ message }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" text @click="dialog = false">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialog_success" persistent max-width="400">
+      <v-card>
+        <v-card-title class="headline">Successfully saved</v-card-title>
+        <v-card-text>Your post was successfully saved.</v-card-text>
+        <v-card-text>Your management link is: {{ management_url }}</v-card-text>
+        <v-card-text>Copy this link and paste it somewhere safe! You will need it later</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="dialog_success = false">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -28,14 +41,14 @@
             :lazy-validation="lazy"
           >
             <v-text-field
-              v-model="name"
+              v-model="post.name"
               :rules="nameRules"
               label="Name"
               required
             ></v-text-field>
 
             <v-text-field
-              v-model="email"
+              v-model="post.email"
               :rules="emailRules"
               label="E-mail"
               required
@@ -43,7 +56,7 @@
 
             <v-text-field
                 ref="zip"
-                v-model="zip"
+                v-model="post.zip"
                 :rules="zipRules"
                 label="ZIP / Postal Code"
                 required
@@ -58,7 +71,7 @@
 
                 <v-select
                   ref="item_category_select"
-                  v-model="item_category"
+                  v-model="post.item_category"
                   :items="item_categories"
                   :rules="[v => !!v || 'Item Category is required']"
                   label="Item Category"
@@ -69,7 +82,7 @@
                 ></v-select>
 
                 <v-combobox
-                  v-model="item"
+                  v-model="post.item"
                   :items="filteredItems"
                   :rules="[v => !!v || 'Item is required']"
                   v-bind:label="this.itemFieldLabel"
@@ -81,8 +94,26 @@
               </v-row>
             </v-container>
 
+            <v-select
+              v-if="editUuid"
+              v-model="post.status"
+              :items="post_statuses"
+              label="Status"
+              required
+              chips
+            ></v-select>            
+
+            <v-text-field
+                ref="quantity"
+                v-model="post.quantity"
+                :rules="[v => !isNaN(v) || 'Quantity must be numeric']"
+                label="Quantity"
+                required
+                placeholder="1"
+              ></v-text-field>
+
             <v-textarea
-              v-model="notes"
+              v-model="post.notes"
               name="input-additional-notes"
               label="Additional Notes"
               value=""
@@ -92,7 +123,8 @@
             <v-btn
               color="success"
               class="mr-4"
-              @click="addNeed"
+              @click="submitPost"
+              :disabled="!valid"
             >
               Submit
             </v-btn>
@@ -108,22 +140,20 @@
 <script>
 
   import { GeoFirestore } from 'geofirestore'
+  import { v4 as uuidv4 } from 'uuid';
   import * as zipcodes from 'zipcodes'
 
   export default {
-    props: ['dataSource', 'itemFieldLabel'],
+    props: ['dataSource', 'itemFieldLabel', 'editUuid', 'postType'],
     data: () => ({
       valid: true,
       dialog: false,
+      dialog_success: false,
       message: '',
-      name: '',
-      zip: '',
-      quantity: 1,
-      notes: '',
+      post_statuses: [ 'New', 'Matched', 'Cancelled' ],
       nameRules: [
         v => !!v || 'Name is required'        
       ],
-      email: '',
       emailRules: [
         v => !!v || 'E-mail is required',
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
@@ -132,16 +162,27 @@
         v => !!v || 'Zip code is required',
         v => !!zipcodes.lookup(v) || 'Zip code must be valid',
       ],    
-      item: null,
       items: [],
-      checkbox: false,
-      lazy: false,
       item_categories: [],
-      item_category: ''
+      lazy: false,      
+      management_url: '',
+      post_id: null, //the firestore document id
+      post: {
+        uuid: 'test123',      
+        email: '',
+        item: '',
+        item_category: '',
+        name: '',
+        zip: '',
+        quantity: 1,
+        notes: '',
+        status: 'New',
+        type: ''
+      }
     }),
     computed: {
       filteredItems() {
-        return this.items.filter(o =>  o.item_category_id == this.item_category);
+        return this.items.filter(o =>  o.item_category_id == this.post.item_category);
       }
     },  
     methods: {
@@ -150,10 +191,8 @@
         this.message = error.message;
         this.dialog = true;
       },
+
       async initForm() {
-        //
-        // @TODO move this logic into a service/plugin
-        //
 
         //
         // Get item categories
@@ -180,32 +219,79 @@
            this.items.push( doc.data() );
           }
         );
-      },
-      async addNeed() {
-        try {
-          console.log('adding need');
-          //
-          // @TODO: this is very similar to the "have" form -- needs to be a service in the middle or something
-          // rather than duplicating this logic.
-          //
 
-          let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.item).get().catch( (error) => { this.handleFirebaseError(error) } );
+        //
+        // If this is an edit, get the post
+        //
+        if ( this.editUuid ) {
+
+          //
+          // @TODO probably refactor these collections into a single 'posts' collection
+          //
+          let data_source = ( this.postType == 'need' ) ? 'needed_items' : 'available_items';
+          
+          let post_result = await this.$fireStore.collection(data_source).where("d.uuid", "==", this.editUuid).get().catch( (error) => { this.handleFirebaseError(error) } );
+          
+          snapshot = post_result.docs;
+
+          if ( snapshot.length > 0 ) {
+            let doc_data = snapshot[0].data().d;
+            
+            //
+            // @TODO - this should be dynamic rather than having every field listed
+            //
+            this.post = {
+              name: doc_data.name,
+              email: doc_data.email,
+              zip: doc_data.zip,
+              quantity: doc_data.quantity,
+              notes: doc_data.notes,
+              item: { 'name': doc_data.item },
+              uuid: doc_data.uuid,
+              status: doc_data.status
+            }
+
+            this.post_id = snapshot[0].id;
+
+            //
+            // Get item category from item
+            // @TODO - this should probably be a method
+            //
+            const item_filtered = this.items.filter( o => o.name == doc_data.item ); 
+
+            if ( item_filtered.length > 0 ) {         
+              const item_category_id = item_filtered[0].item_category_id;
+              const item_category = this.item_categories.filter( o => o.id == item_category_id );
+
+              if ( item_category.length > 0 ) {
+                this.post.item_category = { 'id': item_category[0].id, 'name': item_category[0].name }
+              }
+            }
+
+          }
+
+        }
+      },
+      async submitPost() {
+        try {
+
+          let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.post.item).get().catch( (error) => { this.handleFirebaseError(error) } );
         
           let type_snapshot = type_result.docs;
 
           //
-          // This is a new item type, add it. 
+          // This is a new item type, add it. @TODO - move to a method
           //
           if ( type_snapshot.length <= 0 ) {
 
             const ref = this.$fireStore.collection("item_types").add(
               {
-                name: this.item,
-                item_category_id: this.item_category
+                name: this.post.item,
+                item_category_id: this.post.item_category
               }
             ).then (
               () => {
-                console.log('item type added');
+                
               }
             ).catch( 
               (error) => {
@@ -215,26 +301,60 @@
 
           }
           
-          // Create a GeoFirestore reference
+          //
+          // Set the post type ("have" or "need")
+          //
+          this.post.type = this.postType;
+
           const geoFirestore = new GeoFirestore(this.$fireStore);
-          // Create a GeoCollection reference
           const geoCollection = geoFirestore.collection(this.dataSource);
 
-          const zipInfo = zipcodes.lookup(this.zip);
-          const ref = geoCollection.add(
+          let doc_ref;
+
+          //
+          // This is an edit, set the doc id
+          //
+          if ( this.editUuid ) {
+            if ( !this.post_id ) {
+              this.handleFirebaseError( { 'message': 'No post id found. Cannot update' } );
+              return false;
+            }
+            
+            doc_ref = geoCollection.doc(this.post_id);
+
+          }
+          else {
+
+            //
+            // Generate a UUID for this post
+            //
+            this.post.uuid = uuidv4();
+            doc_ref = geoCollection.doc();
+          }
+
+          const zipInfo = zipcodes.lookup(this.post.zip);
+          
+          const db_ref = doc_ref.set(
             {
-              email: this.email,
-              zip: this.zip,
-              name: this.name,
-              notes: this.notes,
-              quantity: this.quantity,
-              item: this.item.name, //for now we only store the name
-              coordinates: new this.$fireStoreObj.GeoPoint(zipInfo.latitude, zipInfo.longitude)
+              email: this.post.email,
+              zip: this.post.zip,
+              name: this.post.name,
+              notes: this.post.notes,
+              quantity: this.post.quantity,
+              item: this.post.item.name, //for now we only store the name
+              coordinates: new this.$fireStoreObj.GeoPoint(zipInfo.latitude, zipInfo.longitude),
+              uuid: this.post.uuid,
+              type: this.post.type,
+              status: this.post.status
             }
           ).then (
             (doc_ref) => {
-              this.message = 'Added successfully. Your reference ID is: ' + doc_ref.id.toString();
-              this.dialog = true;
+              this.management_url = window.location.protocol + '//' + window.location.hostname + '/manage/' + this.post.uuid;
+              this.dialog_success = true;
+
+              if ( !this.editUuid ) {
+                this.reset();
+              }
             }
           ).catch(
             (error) => {
@@ -258,7 +378,6 @@
       },
     },
     created () {
-      console.log('created');
       this.initForm();      
     },
 
