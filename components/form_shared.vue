@@ -141,7 +141,7 @@
 
   import { GeoFirestore } from 'geofirestore'
   import { v4 as uuidv4 } from 'uuid';
-  import * as location from './util/location'
+  import * as location from './util/location';
 
   export default {
     props: ['dataSource', 'itemFieldLabel', 'editUuid', 'postType'],
