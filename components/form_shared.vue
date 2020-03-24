@@ -20,8 +20,8 @@
 
     <v-dialog v-model="dialog_success" persistent max-width="400">
       <v-card>
-        <v-card-title class="headline">Successfully added</v-card-title>
-        <v-card-text>Your post was successfully added.</v-card-text>
+        <v-card-title class="headline">Successfully saved</v-card-title>
+        <v-card-text>Your post was successfully saved.</v-card-text>
         <v-card-text>Your management link is: {{ management_url }}</v-card-text>
         <v-card-text>Copy this link and paste it somewhere safe! You will need it later</v-card-text>
         <v-card-actions>
@@ -94,6 +94,15 @@
               </v-row>
             </v-container>
 
+            <v-select
+              v-if="editUuid"
+              v-model="post.status"
+              :items="post_statuses"
+              label="Status"
+              required
+              chips
+            ></v-select>            
+
             <v-text-field
                 ref="quantity"
                 v-model="post.quantity"
@@ -114,7 +123,7 @@
             <v-btn
               color="success"
               class="mr-4"
-              @click="addNeed"
+              @click="submitPost"
               :disabled="!valid"
             >
               Submit
@@ -157,6 +166,7 @@
       item_categories: [],
       lazy: false,      
       management_url: '',
+      post_id: null, //the firestore document id
       post: {
         uuid: 'test123',      
         email: '',
@@ -166,7 +176,7 @@
         zip: '',
         quantity: 1,
         notes: '',
-        status: '',
+        status: 'New',
         type: ''
       }
     }),
@@ -181,6 +191,7 @@
         this.message = error.message;
         this.dialog = true;
       },
+
       async initForm() {
 
         //
@@ -214,26 +225,18 @@
         //
         if ( this.editUuid ) {
 
-          console.log('got UUID', this.editUuid);
-
           //
-          // @TODO this is not scalable
+          // @TODO probably refactor these collections into a single 'posts' collection
           //
-          console.log( 'post type', this.postType );
           let data_source = ( this.postType == 'need' ) ? 'needed_items' : 'available_items';
-          console.log('datasource', data_source);
-
+          
           let post_result = await this.$fireStore.collection(data_source).where("d.uuid", "==", this.editUuid).get().catch( (error) => { this.handleFirebaseError(error) } );
           
           snapshot = post_result.docs;
 
-          console.log( 'snapshot', snapshot );
-
           if ( snapshot.length > 0 ) {
             let doc_data = snapshot[0].data().d;
             
-//.filter(o =>  o.item_category_id == this.post.item_category);
-
             //
             // @TODO - this should be dynamic rather than having every field listed
             //
@@ -243,13 +246,16 @@
               zip: doc_data.zip,
               quantity: doc_data.quantity,
               notes: doc_data.notes,
-              item: doc_data.item
-
+              item: { 'name': doc_data.item },
+              uuid: doc_data.uuid,
+              status: doc_data.status
             }
+
+            this.post_id = snapshot[0].id;
 
             //
             // Get item category from item
-            // @TODO - this should probably be a function
+            // @TODO - this should probably be a method
             //
             const item_filtered = this.items.filter( o => o.name == doc_data.item ); 
 
@@ -266,21 +272,15 @@
 
         }
       },
-      async addNeed() {
+      async submitPost() {
         try {
-
-          if ( this.editUuid ) {
-            this.message = 'Editing not yet implemented';
-            this.dialog = true;
-            return false;
-          }
 
           let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.post.item).get().catch( (error) => { this.handleFirebaseError(error) } );
         
           let type_snapshot = type_result.docs;
 
           //
-          // This is a new item type, add it. 
+          // This is a new item type, add it. @TODO - move to a method
           //
           if ( type_snapshot.length <= 0 ) {
 
@@ -291,7 +291,7 @@
               }
             ).then (
               () => {
-                console.log('item type added');
+                
               }
             ).catch( 
               (error) => {
@@ -302,23 +302,39 @@
           }
           
           //
-          // Generate a UUID for this post
-          //
-          this.post.uuid = uuidv4();
-
-          //
-          // Set the type
+          // Set the post type ("have" or "need")
           //
           this.post.type = this.postType;
 
-          // Create a GeoFirestore reference
           const geoFirestore = new GeoFirestore(this.$fireStore);
-          // Create a GeoCollection reference
           const geoCollection = geoFirestore.collection(this.dataSource);
+
+          let doc_ref;
+
+          //
+          // This is an edit, set the doc id
+          //
+          if ( this.editUuid ) {
+            if ( !this.post_id ) {
+              this.handleFirebaseError( { 'message': 'No post id found. Cannot update' } );
+              return false;
+            }
+            
+            doc_ref = geoCollection.doc(this.post_id);
+
+          }
+          else {
+
+            //
+            // Generate a UUID for this post
+            //
+            this.post.uuid = uuidv4();
+            doc_ref = geoCollection.doc();
+          }
 
           const zipInfo = zipcodes.lookup(this.post.zip);
           
-          const ref = geoCollection.add(
+          const db_ref = doc_ref.set(
             {
               email: this.post.email,
               zip: this.post.zip,
@@ -328,13 +344,17 @@
               item: this.post.item.name, //for now we only store the name
               coordinates: new this.$fireStoreObj.GeoPoint(zipInfo.latitude, zipInfo.longitude),
               uuid: this.post.uuid,
-              type: this.post.type
+              type: this.post.type,
+              status: this.post.status
             }
           ).then (
             (doc_ref) => {
               this.management_url = window.location.protocol + '//' + window.location.hostname + '/manage/' + this.post.uuid;
               this.dialog_success = true;
-              this.reset();
+
+              if ( !this.editUuid ) {
+                this.reset();
+              }
             }
           ).catch(
             (error) => {
@@ -357,7 +377,7 @@
         this.$refs.form.resetValidation()
       },
     },
-    mounted () {
+    created () {
       this.initForm();      
     },
 
