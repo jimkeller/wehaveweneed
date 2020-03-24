@@ -19,6 +19,7 @@
     "geofirestore": "^3.4.1",
     "nuxt": "^2.0.0",
     "nuxt-gmaps": "^1.1.9",
+    "uuid": "^7.0.2",
     "uuidv4": "^6.0.6",
     "zipcodes": "^8.0.0"
   },
