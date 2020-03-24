@@ -33,10 +33,9 @@
                 <v-row>
                   <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
                     <v-text-field
-                      ref="zip"
-                      v-model="zip"
-                      :rules="zipRules"
-                      label="ZIP / Postal Code"
+                      ref="address"
+                      v-model="address"
+                      label="Address"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
@@ -82,8 +81,8 @@
 </template>
 
 <script>
-import { GeoFirestore } from 'geofirestore'
-import * as zipcodes from 'zipcodes'
+  import { GeoFirestore } from 'geofirestore'
+  import * as location from './util/location'
 
   export default {
     props: ['dataSource'],
@@ -92,8 +91,7 @@ import * as zipcodes from 'zipcodes'
       dialog: false,
       message: '',
       search: '',
-      zip: '',
-      zipRules: [v => !!zipcodes.lookup(v) || 'Zip code must be valid'],
+      address: '',
       dist: '',
       distRules: [v => !isNaN(v) || 'Distance must be a number'],
       items: [],
@@ -107,7 +105,6 @@ import * as zipcodes from 'zipcodes'
         { text: 'Name', value: 'name' },
         { text: 'Email', value: 'email' },
         { text: 'Quantity', value: 'quantity' },
-        { text: 'Zip', value: 'zip' },
         { text: 'Status', value: 'status' },
       ],
       locations: [
@@ -120,7 +117,7 @@ import * as zipcodes from 'zipcodes'
     }),
     computed: {
       canFilter: function() {
-        return !this.zip || !this.dist
+        return !this.address || !this.dist
       }
     },
     methods: {
@@ -134,26 +131,30 @@ import * as zipcodes from 'zipcodes'
       const geoCollection = new GeoFirestore(this.$fireStore).collection(
         this.dataSource
       )
-      const zipInfo = zipcodes.lookup(this.zip)
-      const result = this.zip //if there's a zip code, filter on the distance
-        ? await geoCollection
-            .near({
-              center: new this.$fireStoreObj.GeoPoint(
-                zipInfo.latitude,
-                zipInfo.longitude
-              ),
-              radius: Number(this.dist)*1.609 //input is in miles, call expects km.
-            })
-            .get()
-            .catch(error => {
-              this.handleFirebaseError(error)
-            })
-        : await geoCollection.firestore
-            .collection(this.dataSource)
-            .get()
-            .catch(error => {
-              this.handleFirebaseError(error)
-            })
+
+      let result;
+      if(this.address) {
+        const addressInfo = location.lookup(this.address)
+        result = await geoCollection
+          .near({
+            center: new this.$fireStoreObj.GeoPoint(
+              addressInfo.latitude,
+              addressInfo.longitude
+            ),
+            radius: Number(this.dist)*1.609 //input is in miles, call expects km.
+          })
+          .get()
+          .catch(error => {
+            this.handleFirebaseError(error)
+          })
+      } else {
+        result = await geoCollection.firestore
+          .collection(this.dataSource)
+          .get()
+          .catch(error => {
+            this.handleFirebaseError(error)
+          })
+      }
 
       let snapshot = result.docs
 
@@ -171,9 +172,9 @@ import * as zipcodes from 'zipcodes'
       this.fetchData()
     },
     clearFilter() {
-      //whether we search by distance or not is based on if this.zip is present
+      //whether we search by distance or not is based on if this.address is present
       //clearing it is sufficient to reset the distance filter
-      this.$refs.zip.reset()
+      this.$refs.address.reset()
       this.dist = ''
       this.filter()
     }

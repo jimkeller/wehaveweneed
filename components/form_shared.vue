@@ -55,10 +55,10 @@
             ></v-text-field>
 
             <v-text-field
-                ref="zip"
-                v-model="post.zip"
-                :rules="zipRules"
-                label="ZIP / Postal Code"
+                ref="address"
+                v-model="post.address"
+                :rules="addressRules"
+                label="Address"
                 required
                 placeholder="79938"
               ></v-text-field>
@@ -141,7 +141,7 @@
 
   import { GeoFirestore } from 'geofirestore'
   import { v4 as uuidv4 } from 'uuid';
-  import * as zipcodes from 'zipcodes'
+  import * as location from './util/location';
 
   export default {
     props: ['dataSource', 'itemFieldLabel', 'editUuid', 'postType'],
@@ -158,9 +158,8 @@
         v => !!v || 'E-mail is required',
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
       ],
-      zipRules:[
-        v => !!v || 'Zip code is required',
-        v => !!zipcodes.lookup(v) || 'Zip code must be valid',
+      addressRules:[
+        v => !!v || 'Address is required'
       ],    
       items: [],
       item_categories: [],
@@ -173,7 +172,7 @@
         item: '',
         item_category: '',
         name: '',
-        zip: '',
+        addr: '',
         quantity: 1,
         notes: '',
         status: 'New',
@@ -243,7 +242,7 @@
             this.post = {
               name: doc_data.name,
               email: doc_data.email,
-              zip: doc_data.zip,
+              address: doc_data.address,
               quantity: doc_data.quantity,
               notes: doc_data.notes,
               item: { 'name': doc_data.item },
@@ -332,24 +331,24 @@
             doc_ref = geoCollection.doc();
           }
 
-          const zipInfo = zipcodes.lookup(this.post.zip);
+          const addressInfo = location.lookup(this.post.address);
           
           const db_ref = doc_ref.set(
             {
               email: this.post.email,
-              zip: this.post.zip,
+              address: this.post.address,
               name: this.post.name,
               notes: this.post.notes,
               quantity: this.post.quantity,
               item: this.post.item.name, //for now we only store the name
-              coordinates: new this.$fireStoreObj.GeoPoint(zipInfo.latitude, zipInfo.longitude),
+              coordinates: new this.$fireStoreObj.GeoPoint(addressInfo.latitude, addressInfo.longitude),
               uuid: this.post.uuid,
               type: this.post.type,
               status: this.post.status
             }
           ).then (
             (doc_ref) => {
-              this.management_url = window.location.protocol + '//' + window.location.hostname + '/manage/' + this.postType + '/' + this.post.uuid;
+              this.management_url = window.location.protocol + '//' + window.location.host + '/manage/' + this.postType + '/' + this.post.uuid;
               this.dialog_success = true;
 
               if ( !this.editUuid ) {
