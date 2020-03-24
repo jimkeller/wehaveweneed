@@ -349,7 +349,7 @@
             }
           ).then (
             (doc_ref) => {
-              this.management_url = window.location.protocol + '//' + window.location.hostname + '/manage/' + this.post.uuid;
+              this.management_url = window.location.protocol + '//' + window.location.hostname + '/manage/' + this.postType + '/' + this.post.uuid;
               this.dialog_success = true;
 
               if ( !this.editUuid ) {
