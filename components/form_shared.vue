@@ -58,7 +58,7 @@
                 ref="address"
                 v-model="post.address"
                 :rules="addressRules"
-                label="Address"
+                label="Zip"
                 required
                 placeholder="79938"
               ></v-text-field>
@@ -159,7 +159,8 @@
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
       ],
       addressRules:[
-        v => !!v || 'Address is required'
+        v => !!v || 'Zip code is required',
+        v => !isNaN(v) || 'Zip code must be numeric'
       ],    
       items: [],
       item_categories: [],
