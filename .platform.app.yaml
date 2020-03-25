@@ -1,0 +1,19 @@
+# .platform.app.yaml
+
+name: node
+type: nodejs:8.11
+disk: 128
+
+# Build hook
+hooks:
+  build: |
+    npm install
+    npm run build
+
+# Web config
+web:
+  commands:
+    start: npm start
+  locations:
+    '/':
+      passthru: true

@@ -1,0 +1,13 @@
+# .platform/routes.yaml
+
+"http://www.{default}/":
+    type: redirect
+    to: "https://{default}/"
+
+"https://{default}/":
+    type: upstream
+    upstream: "node:http"
+
+"https://www.{default}/":
+    type: redirect
+    to: "https://{default}/"
