@@ -127,14 +127,16 @@
         this.dialog = true;
     },
     async fetchData() {
+      const dataSource = (process.env.NODE_ENV === 'development'? 'dev_': '') + this.dataSource;
+
       // Create a GeoCollection reference
       const geoCollection = new GeoFirestore(this.$fireStore).collection(
         'posts'
-      )
+      );
 
       let result;
       if(this.address) {
-        const addressInfo = location.lookup(this.address)
+        const addressInfo = await location.lookup(this.address)
         result = await geoCollection
           .near({
             center: new this.$fireStoreObj.GeoPoint(

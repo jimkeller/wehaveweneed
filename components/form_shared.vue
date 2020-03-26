@@ -270,6 +270,8 @@
         }
       },
       async submitPost() {
+        const dataSource = (process.env.NODE_ENV === 'development'? 'dev_': '') + this.dataSource;
+
         try {
 
           let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.post.item).get().catch( (error) => { this.handleFirebaseError(error) } );
@@ -329,7 +331,7 @@
             doc_ref = geoCollection.doc();
           }
 
-          const addressInfo = location.lookup(this.post.address);
+          const addressInfo = await location.lookup(this.post.address);
           
           const db_ref = doc_ref.set(
             {
