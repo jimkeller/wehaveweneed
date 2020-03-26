@@ -6,6 +6,8 @@
   import Form from '../../../components/form_shared'
 
   export default {
+    data: () => ({
+    }),
 	  validate ({ params }) {
 	    // Must be a number
 	    //return /^\d+$/.test(params.id)

@@ -41,6 +41,7 @@
             :lazy-validation="lazy"
           >
             <v-text-field
+              outlined
               v-model="post.name"
               :rules="nameRules"
               label="Name"
@@ -48,24 +49,52 @@
             ></v-text-field>
 
             <v-text-field
+              outlined
               v-model="post.email"
               :rules="emailRules"
-              label="E-mail"
+              label="Your E-mail Address"
+              placeholder="you@gmail.com"
               required
             ></v-text-field>
 
             <v-text-field
+                outlined
                 ref="address"
                 v-model="post.address"
                 :rules="addressRules"
                 label="Zip"
                 required
                 placeholder="79938"
+                append-icon="mdi-map-marker"
               ></v-text-field>
 
-            <v-container>
+            <header class="pa-0" v-if="postType=='have'">I am offering:</header>
+            <header class="pa-0" v-if="postType=='need'">I am in need of:</header>
+            <v-radio-group v-model="post.offering_type" row>
+              <v-radio
+                v-for="type in offering_types"
+                :key="type.key"
+                :label="type.label"
+                :value="type.key"
+              ></v-radio>
+            </v-radio-group>
+
+            <v-container v-if="post.offering_type=='service'">
               <v-row>
-                <v-subheader> Choose an Item category and Item. You can also type in the item field.</v-subheader>
+                <v-text-field
+                  v-model="post.subject"
+                  label="Short description of the service"
+                  required
+                  placeholder="Someone to buy groceries"
+                  outlined
+                  :required="post.offering_type=='service'"
+                ></v-text-field>
+              </v-row>
+            </v-container>
+
+            <v-container v-if="post.offering_type=='good'">
+              <v-row>
+                <header> Choose an Item category and Item. You can also type in the item field.</header>
               </v-row>
               <v-row>
 
@@ -75,10 +104,11 @@
                   :items="item_categories"
                   :rules="[v => !!v || 'Item Category is required']"
                   label="Item Category"
-                  required
+                  :required="post.offering_type=='good'"
                   chips
                   item-text='name'
                   item-value='id'
+                  outlined
                 ></v-select>
 
                 <v-combobox
@@ -86,10 +116,11 @@
                   :items="filteredItems"
                   :rules="[v => !!v || 'Item is required']"
                   v-bind:label="this.itemFieldLabel"
-                  required
+                  :required="post.offering_type=='good'"
                   chips
                   item-text='name'
-                  item-value='name'              
+                  item-value='name'
+                  outlined          
                 ></v-combobox>
               </v-row>
             </v-container>
@@ -101,15 +132,18 @@
               label="Status"
               required
               chips
+              outlined
             ></v-select>            
 
-            <v-text-field
+            <v-text-field 
+                v-if="post.offering_type=='good'"
                 ref="quantity"
                 v-model="post.quantity"
                 :rules="[v => !isNaN(v) || 'Quantity must be numeric']"
                 label="Quantity"
                 required
                 placeholder="1"
+                outlined
               ></v-text-field>
 
             <v-textarea
@@ -118,6 +152,7 @@
               label="Additional Notes"
               value=""
               hint=""
+              outlined
             ></v-textarea>
 
             <v-btn
@@ -164,6 +199,10 @@
       ],    
       items: [],
       item_categories: [],
+      offering_types: [
+        { 'key': 'good', 'label': 'Goods' },
+        { 'key': 'service', 'label': 'Services' },
+      ],
       lazy: false,      
       management_url: '',
       post_id: null, //the firestore document id
@@ -177,7 +216,9 @@
         quantity: 1,
         notes: '',
         status: 'New',
-        type: ''
+        type: '',
+        offering_type: 'good',
+        subject: ''
       }
     }),
     computed: {
@@ -245,7 +286,9 @@
               notes: doc_data.notes,
               item: { 'name': doc_data.item },
               uuid: doc_data.uuid,
-              status: doc_data.status
+              status: doc_data.status,
+              offering_type: doc_data.offering_type,
+              subject: doc_data.subject
             }
 
             this.post_id = snapshot[0].id;
@@ -270,7 +313,7 @@
         }
       },
       async submitPost() {
-        const dataSource = (process.env.NODE_ENV === 'development'? 'dev_': '') + this.dataSource;
+        const post_collection_name = (process.env.NODE_ENV === 'development'? 'dev_posts': 'posts');
 
         try {
 
@@ -306,7 +349,7 @@
           this.post.type = this.postType;
 
           const geoFirestore = new GeoFirestore(this.$fireStore);
-          const geoCollection = geoFirestore.collection('posts');
+          const geoCollection = geoFirestore.collection(post_collection_name);
 
           let doc_ref;
 
@@ -331,22 +374,32 @@
             doc_ref = geoCollection.doc();
           }
 
-          const addressInfo = await location.lookup(this.post.address);
+          const addressInfo = await location.lookup(this.post.address);          
+
+          if ( !addressInfo || typeof(addressInfo.latitude) == 'undefined' || !addressInfo.latitude ) {
+            this.handleFirebaseError( { 'message': 'Could not look up address data based on that zip code. Please check the value and try again.'} );
+            return false;
+          }          
+
+          let doc_record = {
+            email: this.post.email,
+            address: this.post.address,
+            name: this.post.name,
+            notes: this.post.notes,
+            quantity: this.post.quantity,
+            coordinates: new this.$fireStoreObj.GeoPoint(addressInfo.latitude, addressInfo.longitude),
+            uuid: this.post.uuid,
+            type: this.post.type,
+            status: this.post.status,
+            offering_type: this.post.offering_type,
+            subject: this.post.subject            
+          }
+
+          if ( this.post.offering_type == 'good' ) {
+            doc_record.item = this.post.item.name;
+          }
           
-          const db_ref = doc_ref.set(
-            {
-              email: this.post.email,
-              address: this.post.address,
-              name: this.post.name,
-              notes: this.post.notes,
-              quantity: this.post.quantity,
-              item: this.post.item.name, //for now we only store the name
-              coordinates: new this.$fireStoreObj.GeoPoint(addressInfo.latitude, addressInfo.longitude),
-              uuid: this.post.uuid,
-              type: this.post.type,
-              status: this.post.status
-            }
-          ).then (
+          const db_ref = doc_ref.set( doc_record ).then (
             (doc_ref) => {
               this.management_url = window.location.protocol + '//' + window.location.host + '/manage/' + this.postType + '/' + this.post.uuid;
               this.dialog_success = true;

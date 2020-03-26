@@ -127,12 +127,10 @@
         this.dialog = true;
     },
     async fetchData() {
-      const dataSource = (process.env.NODE_ENV === 'development'? 'dev_': '') + this.dataSource;
+      const post_collection_name = (process.env.NODE_ENV === 'development'? 'dev_posts': 'posts');
 
       // Create a GeoCollection reference
-      const geoCollection = new GeoFirestore(this.$fireStore).collection(
-        'posts'
-      );
+      const geoCollection = new GeoFirestore(this.$fireStore).collection(post_collection_name);
 
       let result;
       if(this.address) {
@@ -152,7 +150,7 @@
           })
       } else {
         result = await geoCollection.firestore
-          .collection('posts')
+          .collection(post_collection_name)
           .where("type", "==", this.postType)
           .get()
           .catch(error => {
