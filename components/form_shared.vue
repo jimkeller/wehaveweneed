@@ -331,7 +331,7 @@
             doc_ref = geoCollection.doc();
           }
 
-          const addressInfo = location.lookup(this.post.address);
+          const addressInfo = await location.lookup(this.post.address);
           
           const db_ref = doc_ref.set(
             {

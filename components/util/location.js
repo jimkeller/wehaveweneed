@@ -1,11 +1,17 @@
-import * as zipcodes from 'zipcodes';
+import fetch from 'node-fetch';
 
-// TODO: Lookup any address. Right now, assumes the address is a zipcodes
-export function lookup(address) {
-  const zipInfo = zipcodes.lookup(address);
+export async function lookup(address) {
+  const params = new URLSearchParams({
+    q: address,
+    limit: "1",
+    format: "json"
+  });
+  const ENDPOINT = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
+  const ret = await fetch(ENDPOINT).then(res => res.json());
+  const data = ret[0];
 
   return {
-    latitude: zipInfo.latitude,
-    longitude: zipInfo.longitude
+    latitude: Number(data.lat),
+    longitude: Number(data.lon)
   }
 }
