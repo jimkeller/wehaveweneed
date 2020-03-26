@@ -272,6 +272,8 @@
         }
       },
       async submitPost() {
+        const dataSource = (process.env.NODE_ENV === 'development'? 'dev_': '') + this.dataSource;
+
         try {
 
           let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.post.item).get().catch( (error) => { this.handleFirebaseError(error) } );
@@ -306,7 +308,7 @@
           this.post.type = this.postType;
 
           const geoFirestore = new GeoFirestore(this.$fireStore);
-          const geoCollection = geoFirestore.collection(this.dataSource);
+          const geoCollection = geoFirestore.collection(dataSource);
 
           let doc_ref;
 

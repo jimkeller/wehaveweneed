@@ -127,9 +127,11 @@
         this.dialog = true;
     },
     async fetchData() {
+      const dataSource = (process.env.NODE_ENV === 'development'? 'dev_': '') + this.dataSource;
+
       // Create a GeoCollection reference
       const geoCollection = new GeoFirestore(this.$fireStore).collection(
-        this.dataSource
+        dataSource
       )
 
       let result;
@@ -149,7 +151,7 @@
           })
       } else {
         result = await geoCollection.firestore
-          .collection(this.dataSource)
+          .collection(dataSource)
           .get()
           .catch(error => {
             this.handleFirebaseError(error)
@@ -180,7 +182,6 @@
     }
   },
   created() {
-    console.log('created')
     this.fetchData()
   }
 }
