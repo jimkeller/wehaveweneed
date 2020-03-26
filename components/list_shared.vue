@@ -1,5 +1,5 @@
 <template>
-  <v-layout>
+  <v-container>
     <v-dialog v-model="dialog" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Message</v-card-title>
@@ -77,7 +77,7 @@
         </v-col>
       </v-row>
     </v-container>
-  </v-layout>
+  </v-container>
 </template>
 
 <script>

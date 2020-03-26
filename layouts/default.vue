@@ -25,38 +25,52 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-
+    
     <v-app-bar 
       :clipped-left="clipped"
       fixed
       app
       class="shrink light-blue darken-4 white--text"
+      :extension-height="( $vuetify.breakpoint.smAndDown ) ? 0 : '60px'"
+      dense
       >
 
-      <v-app-bar-nav-icon dark @click.stop="drawer = !drawer" />
+        <v-container>
+          <v-row align="center">
+            <v-app-bar-nav-icon dark @click.stop="drawer = !drawer" />
 
-      <v-toolbar-title>
-        <router-link to="/" tag="span" style="cursor: pointer">
-          {{ appTitle }}
-        </router-link>
-      </v-toolbar-title>
-      
-      <v-spacer></v-spacer>
-      <v-toolbar-items class="hidden-xs-only">
-        <v-btn
-          class="white--text"
-          text
-          v-for="item in menuItems"
-          :key="item.title"
-          :to="item.path">
-          <!-- <v-icon left dark>mdi-{{ item.icon }}</v-icon> -->          
-          {{ item.title }}
-        </v-btn>
-      </v-toolbar-items>
+            <v-toolbar-title>
+              <router-link to="/" tag="span" style="cursor: pointer">
+                {{ appTitle }}
+              </router-link>
+            </v-toolbar-title>
+          </v-row>
+        </v-container>
+
+        <template v-slot:extension>
+          <v-container class="hidden-sm-and-down ">
+
+            <v-tabs background-color="light-blue darken-4">
+              <v-tab                
+                class="light-blue darken-4 white--text"
+                text
+                v-for="item in menuItems" 
+                :key="item.title"               
+                :to="item.path">
+                <!-- <v-icon left dark>mdi-{{ item.icon }}</v-icon> -->          
+                {{ item.title }}
+              </v-tab>
+            </v-tabs>
+
+
+          </v-container>          
+        </template>
+
     </v-app-bar>
 
+
     <v-content>
-      <v-container>
+      <v-container fluid class="pa-0 ma-0">
         <nuxt />
       </v-container>
     </v-content>
@@ -78,7 +92,7 @@ export default {
       drawer: false,
       fixed: false,
       menuItems: [
-        //{ title: 'Home', path: '/', icon: 'home' },
+        { title: 'Home', path: '/', icon: 'home' },
         { title: 'I Have Something', path: '/form_have', icon: 'check_box' },
         { title: 'I Need Something', path: '/form_need', icon: 'check_box_outline_blank' },
         { title: 'See available items', path: '/list_have', icon: 'list' },

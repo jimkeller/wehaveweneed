@@ -5,7 +5,7 @@
   }
 </style>
 <template>
-  <v-layout>
+  <v-container>
 
     <v-dialog v-model="dialog" persistent max-width="400">
       <v-card>
@@ -31,9 +31,9 @@
       </v-card>
     </v-dialog>
 
-    <v-container fluid >
+    <v-container>
       <v-row>
-        <v-col cols="6" sm="12">
+        <v-col cols="12" lg="10">
 
          <v-form
             ref="form"
@@ -169,7 +169,7 @@
         </v-col>
       </v-row>
     </v-container>
-  </v-layout>
+  </v-container>
 </template>
 
 <script>
