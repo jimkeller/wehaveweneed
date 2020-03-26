@@ -85,7 +85,7 @@
   import * as location from './util/location'
 
   export default {
-    props: ['dataSource'],
+    props: ['postType'],
     data: () => ({
       valid: true,
       dialog: false,
@@ -129,7 +129,7 @@
     async fetchData() {
       // Create a GeoCollection reference
       const geoCollection = new GeoFirestore(this.$fireStore).collection(
-        this.dataSource
+        'posts'
       )
 
       let result;
@@ -143,13 +143,15 @@
             ),
             radius: Number(this.dist)*1.609 //input is in miles, call expects km.
           })
+          .where("type", "==", this.postType)
           .get()
           .catch(error => {
             this.handleFirebaseError(error)
           })
       } else {
         result = await geoCollection.firestore
-          .collection(this.dataSource)
+          .collection('posts')
+          .where("type", "==", this.postType)
           .get()
           .catch(error => {
             this.handleFirebaseError(error)
@@ -180,8 +182,7 @@
     }
   },
   created() {
-    console.log('created')
-    this.fetchData()
+    this.fetchData();
   }
 }
 </script>

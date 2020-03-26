@@ -144,7 +144,7 @@
   import * as location from './util/location';
 
   export default {
-    props: ['dataSource', 'itemFieldLabel', 'editUuid', 'postType'],
+    props: ['itemFieldLabel', 'editUuid', 'postType'],
     data: () => ({
       valid: true,
       dialog: false,
@@ -168,7 +168,7 @@
       management_url: '',
       post_id: null, //the firestore document id
       post: {
-        uuid: 'test123',      
+        uuid: '',      
         email: '',
         item: '',
         item_category: '',
@@ -225,17 +225,14 @@
         //
         if ( this.editUuid ) {
 
-          //
-          // @TODO probably refactor these collections into a single 'posts' collection
-          //
-          let data_source = ( this.postType == 'need' ) ? 'needed_items' : 'available_items';
+          const postCollection = new GeoFirestore(this.$fireStore).collection('posts')
           
-          let post_result = await this.$fireStore.collection(data_source).where("d.uuid", "==", this.editUuid).get().catch( (error) => { this.handleFirebaseError(error) } );
+          let post_result = await postCollection.where("uuid", "==", this.editUuid).get().catch( (error) => { this.handleFirebaseError(error) } );
           
           snapshot = post_result.docs;
 
           if ( snapshot.length > 0 ) {
-            let doc_data = snapshot[0].data().d;
+            let doc_data = snapshot[0].data();
             
             //
             // @TODO - this should be dynamic rather than having every field listed
@@ -307,7 +304,7 @@
           this.post.type = this.postType;
 
           const geoFirestore = new GeoFirestore(this.$fireStore);
-          const geoCollection = geoFirestore.collection(this.dataSource);
+          const geoCollection = geoFirestore.collection('posts');
 
           let doc_ref;
 

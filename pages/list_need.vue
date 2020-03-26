@@ -1,5 +1,5 @@
 <template>
-  <List dataSource='needed_items'/>
+  <List post-type="need"/>
 </template>
 
 <script>

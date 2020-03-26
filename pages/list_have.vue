@@ -1,5 +1,5 @@
 <template>
-  <List dataSource='available_items'/>
+  <List post-type="have"/>
 </template>
 
 <script>
