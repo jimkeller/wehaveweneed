@@ -34,14 +34,29 @@
       >
 
         <v-container>
-          <v-row align="center">
-            <v-app-bar-nav-icon dark @click.stop="drawer = !drawer" class="d-md-none" />
-
-            <v-toolbar-title>
-              <router-link to="/" tag="span" style="cursor: pointer">
-                {{ appTitle }}
-              </router-link>
-            </v-toolbar-title>
+          <v-row align="center" class="justify-space-between">
+            <v-col>
+              <v-container style="min-width:300px">
+                <v-row align="center" class="flex-shrink-0" >
+                  <v-col class="d-md-none flex-grow-0">
+                    <v-app-bar-nav-icon dark @click.stop="drawer = !drawer" class="d-md-none" />
+                  </v-col>
+                  <v-col>
+                    <v-toolbar-title class="">
+                      <router-link to="/" tag="span" style="cursor: pointer">
+                        {{ appTitle }}
+                      </router-link>
+                    </v-toolbar-title>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-col>
+            <v-col align="right" v-if="this.$store.state.user.email">
+              <span v-if="this.$store.state.user.email">{{ this.$store.state.user.email }}</span><a class="pl-2 white--text" href="/logout">(logout)</a>
+            </v-col>
+            <v-col align="right" v-if="!this.$store.state.user.email">
+              <v-btn :small="( $vuetify.breakpoint.smAndDown ) ? true : false" to="/sign_in">Sign In</v-btn>              
+            </v-col>
           </v-row>
         </v-container>
 
@@ -94,7 +109,7 @@ export default {
         { title: 'I Need Something', path: '/form_need', icon: 'check_box_outline_blank' },
         { title: 'See available items', path: '/list_have', icon: 'list' },
         { title: 'See needed items', path: '/list_need', icon: 'check_box_outline_blank' },
-        { title: 'Sign In', path: '/sign_in', icon: 'face' }
+        //{ title: 'Sign In', path: '/sign_in', icon: 'face' }
       ],
       appTitle: 'We Have / We Need'
     }

@@ -16,9 +16,9 @@
       fluid
       max-height="600px"
       :min-height="( $vuetify.breakpoint.smAndDown ) ? '200px' : '400px'"
-      :src="require('@/assets/img/tomas-sobek-nVqNmnAWz3A-unsplash.jpg')"
+      :src="require('@/assets/img/kelly-sikkema-heart-hands.jpg')"
       class="pa-0 ma-0"
-      gradient="to top right, rgba(0,0,0,.8), rgba(0,0,0,.5)"
+      gradient="to top right, rgba(0,0,0,.7), rgba(0,0,0,.4)"
     >
       <v-container fill-height align="center" justify="center">
         <v-row
@@ -128,7 +128,11 @@ export default {
       { 'label': 'Find Something', 'link': '/list_have' },
       { 'label': 'See What People Need', 'link': '/list_need' }
     ]
-  })
+  }),
+  mounted() {
+    console.log('mounted');
+
+  }
   // head () {
   //   return {
   //     app_title: "We Have / We Need",

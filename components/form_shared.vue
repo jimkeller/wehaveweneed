@@ -432,6 +432,13 @@
     created () {
       this.initForm();      
     },
+    mounted() {
+      console.log('state store', this.$store.state);
+      console.log('user store', this.$store.state.user);
+      if ( this.$store.state.user ) {
+        console.log('stored user email', this.$store.state.user.email);
+      }
+    }
 
 
   }

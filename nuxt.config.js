@@ -51,37 +51,33 @@ export default {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
-    [
-      '@nuxtjs/firebase',
-      {
-        config: {
-          apiKey: "AIzaSyANiHf3C8EswR7HWLENDuAVmxr06okgp6c",
-          authDomain: "wehaveweneed-2020.firebaseapp.com",
-          databaseURL: "https://wehaveweneed-2020.firebaseio.com",
-          projectId: "wehaveweneed-2020",
-          storageBucket: "wehaveweneed-2020.appspot.com",
-          messagingSenderId: "841246024988",
-          appId: "1:841246024988:web:b4901625d57bef230306d9"
-        },
-        services: {
-          auth: true,
-          firestore: true
-        },
-        auth: {
-          initialize: {
-            onAuthStateChangedMutation: 'ON_AUTH_STATE_CHANGED_MUTATION',
-            // onAuthStateChangedAction: 'onAuthStateChangedAction'
-          },
-          ssr: true
-        }
-      }
-    ],  
+    '@nuxtjs/firebase',      
     // ['nuxt-gmaps', {
     //   key: 'AIzaSyANiHf3C8EswR7HWLENDuAVmxr06okgp6c',
     //   //you can use libraries: ['places']
-    // }]
-  
+    // }]  
   ],
+  firebase: {
+    config: {
+      apiKey: "AIzaSyANiHf3C8EswR7HWLENDuAVmxr06okgp6c",
+      authDomain: "wehaveweneed-2020.firebaseapp.com",
+      databaseURL: "https://wehaveweneed-2020.firebaseio.com",
+      projectId: "wehaveweneed-2020",
+      storageBucket: "wehaveweneed-2020.appspot.com",
+      messagingSenderId: "841246024988",
+      appId: "1:841246024988:web:b4901625d57bef230306d9"
+    },
+    services: {
+      auth: {
+        initialize: {
+          onAuthStateChangedMutation: 'user/ON_AUTH_STATE_CHANGED_MUTATION',
+          // onAuthStateChangedAction: 'onAuthStateChangedAction'
+        },
+        ssr: true
+      },
+      firestore: true
+    },
+  },
   pwa: {
     // disable the modules you don't need
     meta: false,
@@ -92,11 +88,11 @@ export default {
     workbox: {
       importScripts: [
         // ...
-        '/firebase-auth-sw.js'
+        'firebase-auth-sw.js'
       ],
       // by default the workbox module will not install the service worker in dev environment to avoid conflicts with HMR
       // only set this true for testing and remember to always clear your browser cache in development
-      dev: false
+      dev: true
     }
   },
 

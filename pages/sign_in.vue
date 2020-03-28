@@ -34,6 +34,7 @@
         }
 
         var uiConfig = {
+            signInFlow: 'popup',
             signInSuccessUrl: "/",
             signInOptions: [
               firebase.auth.FacebookAuthProvider.PROVIDER_ID,
