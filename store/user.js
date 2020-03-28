@@ -10,17 +10,15 @@ export const mutations = {
     
     console.log("AUTH STATE MUTATION");
     // Do this:
+    if ( authUser ) {
+	    state.uid = authUser.uid;
+	    state.email = authUser.email;
+	    state.emailVerified = authUser.emailVerified;    
+	  	console.log('authUser', authUser);
+	  }
     
-    state.uid = authUser.uid;
-    state.email = authUser.email;
-    state.emailVerified = authUser.emailVerified;    
-
-    state.foo = 'whatsgood';
-
-
-    console.log('state.user', state.user );
     // Or this:
-    console.log('authUser', authUser);
+    
     // const { uid, email, emailVerified } = authUser
     // state.user = { uid, email, emailVerified }
   }
