@@ -14,10 +14,11 @@
     <v-img
       fill-height
       fluid
+      max-height="600px"
       :min-height="( $vuetify.breakpoint.smAndDown ) ? '200px' : '400px'"
-      :src="require('@/assets/img/helena-lopes-PGnqT0rXWLs-unsplash.jpg')"
+      :src="require('@/assets/img/tomas-sobek-nVqNmnAWz3A-unsplash.jpg')"
       class="pa-0 ma-0"
-      gradient="to top right, rgba(0,0,0,.5), rgba(0,0,0,.3)"
+      gradient="to top right, rgba(0,0,0,.8), rgba(0,0,0,.5)"
     >
       <v-container fill-height align="center" justify="center">
         <v-row
@@ -25,61 +26,43 @@
           justify="center"
         >
           <v-col class="text-center">
-            <h1 class="white--text display-1 mb-4">WeHave / WeNeed</h1>
-            <h4 class="subheader white--text">Getting supplies to the people who need them</h4>        
+            <h1 class="white--text display-2 mb-4">WeHave / WeNeed</h1>
+            <h4 class="subheader white--text headline">Getting emergency supplies to the people who need them</h4>        
           </v-col>
         </v-row>
       </v-container>
     </v-img>
 
     <v-container>
-      <v-row
-        column
-        justify-center
-        align-center
-      >
-        <v-col
 
+      <v-row>
+
+        <v-col
+          v-for="button in buttons"
+          :key="button.link"
+          cols="12"
+          md="3"
         >
 
+
+          <v-card
+            color="light-blue darken-4 white--text"
+            dark
+            class="d-flex align-center"
+            outline
+            hover
+            height="150"
+            :to="button.link"
+          >
+            <v-card-text>
+              <p class="text-center title font-weight-regular white--text">
+                {{ button.label }}
+              </p>
+            </v-card-text>
+          </v-card>
         </v-col>
       </v-row>
-      <v-row>
-        <v-col justify-center align="center">
-          <v-btn
-            x-large
-            color="primary"
-            nuxt
-            to="/form_have"
-          >
-            I have something
-          </v-btn>
-          <v-btn
-            x-large
-            color="primary"
-            nuxt
-            to="/form_need"
-          >
-            I need something
-          </v-btn>
-          <v-btn
-            x-large
-            color="primary"
-            nuxt
-            to="/list_have"
-          >
-            See available items
-          </v-btn>
-          <v-btn
-            x-large
-            color="primary"
-            nuxt
-            to="/list_need"
-          >
-            See needed items
-          </v-btn>
-        </v-col>
-      </v-row>
+      
       <v-row>
         <v-col>
           <v-card>
@@ -137,6 +120,15 @@
 <script>
 
 export default {
+
+  data: () => ({
+    'buttons': [
+      { 'label': 'I Have Something', 'link': '/form_have' },
+      { 'label': 'I Need Something', 'link': '/form_need' },
+      { 'label': 'Find Something', 'link': '/list_have' },
+      { 'label': 'See What People Need', 'link': '/list_need' }
+    ]
+  })
   // head () {
   //   return {
   //     app_title: "We Have / We Need",

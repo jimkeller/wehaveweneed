@@ -3,10 +3,9 @@
 
     <v-navigation-drawer
       v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
       fixed
       app
+      disable-resize-watcher
     >
       <v-list>
         <v-list-item
@@ -27,7 +26,6 @@
     </v-navigation-drawer>
     
     <v-app-bar 
-      :clipped-left="clipped"
       fixed
       app
       class="shrink light-blue darken-4 white--text"
@@ -37,7 +35,7 @@
 
         <v-container>
           <v-row align="center">
-            <v-app-bar-nav-icon dark @click.stop="drawer = !drawer" />
+            <v-app-bar-nav-icon dark @click.stop="drawer = !drawer" class="d-md-none" />
 
             <v-toolbar-title>
               <router-link to="/" tag="span" style="cursor: pointer">
@@ -88,7 +86,6 @@
 export default {
   data () {
     return {
-      clipped: false,
       drawer: false,
       fixed: false,
       menuItems: [
@@ -97,9 +94,8 @@ export default {
         { title: 'I Need Something', path: '/form_need', icon: 'check_box_outline_blank' },
         { title: 'See available items', path: '/list_have', icon: 'list' },
         { title: 'See needed items', path: '/list_need', icon: 'check_box_outline_blank' },
-        //{ title: 'Sign Up', path: '/sign_up', icon: 'face' }
+        { title: 'Sign In', path: '/sign_in', icon: 'face' }
       ],
-      miniVariant: false,
       appTitle: 'We Have / We Need'
     }
   }

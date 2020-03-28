@@ -12,64 +12,63 @@
       </v-card>
     </v-dialog>
 
-   <v-form
-      ref="form"
-      v-model="valid"
-      :lazy-validation="lazy"
-    >
+    <v-container>
+      <v-row>
+        <v-col cols="12" md="8">
+         <v-form
+            ref="form"
+            v-model="valid"
+            :lazy-validation="lazy"
+          >
 
-      <v-text-field
-        v-model="email"
-        :rules="rules.email"
-        label="E-mail"
-        required
-      ></v-text-field>
+            <v-text-field
+              outlined
+              v-model="email"
+              :rules="rules.email"
+              label="E-mail"
+              required
+            ></v-text-field>
 
-      <v-text-field
-        v-model="password"
-        :append-icon="password_show ? 'mdi-eye' : 'mdi-eye-off'"
-        :rules="[rules.required, rules.min]"
-        :type="password_show ? 'text' : 'password'"
-        name="input-10-1"
-        label="Password"
-        hint="At least 6 characters"
-        counter
-        @click:append="password_show = !password_show"
-      ></v-text-field>
+            <v-text-field
+              outlined
+              v-model="password"
+              :append-icon="password_show ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="[rules.required, rules.min]"
+              :type="password_show ? 'text' : 'password'"
+              name="input-10-1"
+              label="Password"
+              hint="At least 6 characters"
+              counter
+              @click:append="password_show = !password_show"
+            ></v-text-field>
 
-      <v-btn
-        :disabled="!valid"
-        color="success"
-        class="mr-4"
-        @click="createUser"
-      >
-        Create User
-      </v-btn>
+            <v-text-field
+                outlined
+                ref="zip"
+                v-model="zip"
+                :rules="rules.zip"
+                label="Zip Code"
+                required
+                placeholder="79938"
+                append-icon="mdi-map-marker"
+              ></v-text-field>
 
-      <v-btn
-        :disabled="!valid"
-        color="success"
-        class="mr-4"
-        @click="addItem"
-      >
-        Validate
-      </v-btn>
+            <v-checkbox v-model="notifications" label="Send me email notifications when someone in my area needs something">
+            </v-checkbox>
 
-      <v-btn
-        color="error"
-        class="mr-4"
-        @click="reset"
-      >
-        Reset Form
-      </v-btn>
+            <v-btn
+              :disabled="!valid"
+              color="success"
+              class="mr-4"
+              @click="createUser"
+            >
+              Submit
+            </v-btn>
 
-      <v-btn
-        color="warning"
-        @click="resetValidation"
-      >
-        Reset Validation
-      </v-btn>
-    </v-form>
+          </v-form>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-layout>
 </template>
 
@@ -83,13 +82,18 @@
       password: '',
       error: '',
       email: '',
+      notifications: false,
       rules: {
         required: value => !!value || 'Required.',
         min: v => v.length >= 6 || 'Min 6 characters',               
         email: [
         	v => !!v || 'E-mail is required',
         	v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-      	]
+      	],
+        zip: [
+          v => !!v || 'Zip code is required',
+          v => !isNaN(v) || 'Zip code must be numeric'
+        ]
       },
       select: null,
       items: [],
