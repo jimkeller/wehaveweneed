@@ -52,7 +52,7 @@
               </v-container>
             </v-col>
             <v-col align="right" v-if="this.$store.state.user.email">
-              <span v-if="this.$store.state.user.email">{{ this.$store.state.user.email }}</span><a class="pl-2 white--text" href="/logout">(logout)</a>
+              <span v-if="this.$store.state.user.email">{{ this.$store.state.user.email }}</span><a class="pl-2 white--text" @click="userSignOut">(logout)</a>
             </v-col>
             <v-col align="right" v-if="!this.$store.state.user.email">
               <v-btn :small="( $vuetify.breakpoint.smAndDown ) ? true : false" to="/sign_in">Sign In</v-btn>              
@@ -113,6 +113,18 @@ export default {
       ],
       appTitle: 'We Have / We Need'
     }
+  },
+  methods: {
+    async userSignOut() {
+      await this.$fireAuth.signOut().catch(function(error) {
+        console.log('logout error', error);
+      });
+
+      this.$router.go({ path: 'login' });
+
+    }
+
+
   }
 }
 </script>

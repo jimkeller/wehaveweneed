@@ -3,6 +3,19 @@
     padding-left: 0;
     padding-right: 0;
   }
+
+  .firebaseui-container {
+    margin: 0;
+  }
+
+  .firebaseui-idp-list {
+    padding-left: 0 !important;
+  }
+
+  .firebaseui-list-item {
+    padding-left: 0 !important;
+    text-align: left !important;
+  }
 </style>
 <template>
   <v-container>
@@ -33,13 +46,20 @@
 
     <v-container>
       <v-row>
-        <v-col cols="12" lg="10">
+        <v-col cols="12" lg="10">      
+        <v-card class="pb-4 mb-4" v-show="!this.$store.state.user.uid">
+          <v-card-title class="subtitle-1">Please sign in before submitting this form</v-card-title>
+          <div id="firebaseui-auth-container"></div>
+        </v-card>
+        
 
          <v-form
             ref="form"
             v-model="valid"
             :lazy-validation="lazy"
           >
+
+            <!--
             <v-text-field
               outlined
               v-model="post.name"
@@ -48,6 +68,7 @@
               required
             ></v-text-field>
 
+            
             <v-text-field
               outlined
               v-model="post.email"
@@ -56,6 +77,7 @@
               placeholder="you@gmail.com"
               required
             ></v-text-field>
+            -->
 
             <v-text-field
                 outlined
@@ -159,7 +181,7 @@
               color="success"
               class="mr-4"
               @click="submitPost"
-              :disabled="!valid"
+              :disabled="!valid || !this.$store.state.user.uid"
             >
               Submit
             </v-btn>
@@ -177,10 +199,19 @@
   import { GeoFirestore } from 'geofirestore'
   import { v4 as uuidv4 } from 'uuid';
   import * as location from './util/location';
+  import firebase from 'firebase/app';
 
   export default {
     props: ['itemFieldLabel', 'editUuid', 'postType'],
+    head: {
+      script: [
+      ],
+      link: [
+        { rel: 'stylesheet', href: 'https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css' }
+      ]
+    },
     data: () => ({
+      user: {},
       valid: true,
       dialog: false,
       dialog_success: false,
@@ -421,6 +452,7 @@
       },
       validate () {
         this.$refs.form.validate()
+        //return (this.$store.state.user && this.$store.state.user.uid && this.$refs.form.validate());
       },
       reset () {
         this.$refs.form.reset()
@@ -433,11 +465,43 @@
       this.initForm();      
     },
     mounted() {
-      console.log('state store', this.$store.state);
-      console.log('user store', this.$store.state.user);
-      if ( this.$store.state.user ) {
-        console.log('stored user email', this.$store.state.user.email);
+
+      if ( !this.$store.state.user || !this.$store.state.user.uid ) {
+
+        var firebaseui = require('firebaseui');
+
+        //console.log( 'auth', this.$fireAuthObj);
+
+        let ui = firebaseui.auth.AuthUI.getInstance();
+
+        if (!ui) {
+            ui = new firebaseui.auth.AuthUI(firebase.auth());
+        }
+
+        var uiConfig = {
+          signInFlow: 'popup',
+          signInOptions: [
+            firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            firebase.auth.EmailAuthProvider.PROVIDER_ID,
+          ],
+          callbacks: {
+            signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+              // User successfully signed in.
+              // Return type determines whether we continue the redirect automatically
+              // or whether we leave that to developer to handle.
+
+              console.log('auth result');
+
+              return false;
+            }
+          }
+        };
+        
+        ui.start("#firebaseui-auth-container", uiConfig);    
       }
+
+
     }
 
 
