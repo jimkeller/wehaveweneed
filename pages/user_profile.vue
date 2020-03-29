@@ -118,7 +118,7 @@
 
             let place = this.autocomplete.getPlace();
 
-            console.log('place', place);
+            
 
             if ( !place.geometry ) {
               this.error = 'Error finding that address. Please try again';
@@ -141,10 +141,25 @@
               coordinates: new this.$fireStoreObj.GeoPoint(place.geometry.location.lat(), place.geometry.location.lng())
             };
 
+            place.address_components.forEach(
+              function( component ) {
+                if ( typeof(component.types) != 'undefined' ) {
+                  component.types.forEach( 
+                    function( component_type ) {
+                      if ( component_type == 'postal_code' ) {
+                        user_record.address.zip = component.long_name;
+                      }
+                    }
+                  );
+                }
+              }
+            );
+
           }
 
           user_record.notify = this.notify;
           user_record.notify_miles = this.notify_miles;
+
 
           const userCollection = new GeoFirestore(this.$fireStore).collection('user_data')
 
