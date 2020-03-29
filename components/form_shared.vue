@@ -299,8 +299,8 @@
         // If this is an edit, get the post
         //
         if ( this.editUuid ) {
-
-          const postCollection = new GeoFirestore(this.$fireStore).collection('posts')
+          const post_collection_name = (process.env.NODE_ENV === 'development'? 'dev_posts': 'posts'); //@TODO - use firestore config for environments
+          const postCollection = new GeoFirestore(this.$fireStore).collection(post_collection_name)
           
           let post_result = await postCollection.where("uuid", "==", this.editUuid).get().catch( (error) => { this.handleFirebaseError(error) } );
           
@@ -318,7 +318,7 @@
               address: doc_data.address,
               quantity: doc_data.quantity,
               notes: doc_data.notes,
-              item: doc_data.item,
+              item: { name: doc_data.item },
               uuid: doc_data.uuid,
               status: doc_data.status,
               offering_type: doc_data.offering_type,
@@ -351,18 +351,20 @@
 
         try {
 
-          let type_result = await this.$fireStore.collection('item_types').where("name", "==", this.post.item).get().catch( (error) => { this.handleFirebaseError(error) } );
+          let item_name = ( typeof(this.post.item) == 'string' ) ? this.post.item : this.post.item.name;
+          
+          let type_result = await this.$fireStore.collection('item_types').where("name", "==", item_name).get().catch( (error) => { this.handleFirebaseError(error) } );
         
           let type_snapshot = type_result.docs;
 
           //
           // This is a new item type, add it. @TODO - move to a method
           //
-          if ( type_snapshot.length <= 0 ) {
+          if ( type_snapshot.length <= 0 ) {            
 
             const ref = this.$fireStore.collection("item_types").add(
               {
-                name: this.post.item,
+                name: item_name,
                 //item_category_id: this.post.item_category
               }
             ).then (
@@ -415,10 +417,8 @@
             return false;
           }          
 
-          let subject;
-
           if ( this.post_type == 'good' ) {
-            this.post.subject = this.item.name;
+            this.post.subject = item_name;
           }
 
           let doc_record = {
@@ -434,7 +434,7 @@
           }
 
           if ( this.post.offering_type == 'good' ) {
-            doc_record.item = this.post.item.name;
+            doc_record.item = item_name;
           }
           
           const db_ref = doc_ref.set( doc_record ).then (
