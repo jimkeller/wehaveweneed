@@ -52,7 +52,7 @@
               </v-container>
             </v-col>
             <v-col align="right" v-show="this.$store.state.user.email">
-              <span>{{ this.$store.state.user.email }}</span><a class="pl-2 white--text" @click="userSignOut">(logout)</a>
+              <span><router-link class="white--text" to="/user_profile">{{ this.$store.state.user.email }}</router-link></span><a class="pl-2 white--text" @click="userSignOut">(logout)</a>
             </v-col>
             <v-col align="right" v-show="!this.$store.state.user.email">
               <v-btn :small="( $vuetify.breakpoint.smAndDown ) ? true : false" to="/sign_in">Sign In</v-btn>              

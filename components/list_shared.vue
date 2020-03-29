@@ -146,11 +146,10 @@
       distRules: [v => !isNaN(v) || 'Distance must be a number'],
       items: [],
       headers: [
-        {
-          text: 'Item Name',
+        { text: 'Subject/Item',
           align: 'start',
           sortable: false,
-          value: 'item',
+          value: 'subject',
         },
         { text: 'Status', value: 'status' },
       ],

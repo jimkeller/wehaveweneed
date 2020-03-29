@@ -56,7 +56,7 @@
          <v-form
             ref="form"
             v-model="valid"
-            :lazy-validation="lazy"
+            :lazy-validation="true"
           >
 
             <!--
@@ -116,10 +116,12 @@
 
             <v-container v-if="post.offering_type=='good'">
               <v-row>
-                <header> Choose an Item category and Item. You can also type in the item field.</header>
+                <!-- <header> Choose an Item category and Item. You can also type in the item field.</header> -->
+                <header>Choose or type an item below</header>
               </v-row>
               <v-row>
 
+                <!--
                 <v-select
                   ref="item_category_select"
                   v-model="post.item_category"
@@ -132,10 +134,11 @@
                   item-value='id'
                   outlined
                 ></v-select>
+                -->
 
                 <v-combobox
                   v-model="post.item"
-                  :items="filteredItems"
+                  :items="items"
                   :rules="[v => !!v || 'Item is required']"
                   v-bind:label="this.itemFieldLabel"
                   :required="post.offering_type=='good'"
@@ -315,7 +318,7 @@
               address: doc_data.address,
               quantity: doc_data.quantity,
               notes: doc_data.notes,
-              item: { 'name': doc_data.item },
+              item: doc_data.item,
               uuid: doc_data.uuid,
               status: doc_data.status,
               offering_type: doc_data.offering_type,
@@ -328,16 +331,16 @@
             // Get item category from item
             // @TODO - this should probably be a method
             //
-            const item_filtered = this.items.filter( o => o.name == doc_data.item ); 
+            // const item_filtered = this.items.filter( o => o.name == doc_data.item ); 
 
-            if ( item_filtered.length > 0 ) {         
-              const item_category_id = item_filtered[0].item_category_id;
-              const item_category = this.item_categories.filter( o => o.id == item_category_id );
+            // if ( item_filtered.length > 0 ) {         
+            //   const item_category_id = item_filtered[0].item_category_id;
+            //   const item_category = this.item_categories.filter( o => o.id == item_category_id );
 
-              if ( item_category.length > 0 ) {
-                this.post.item_category = { 'id': item_category[0].id, 'name': item_category[0].name }
-              }
-            }
+            //   if ( item_category.length > 0 ) {
+            //     this.post.item_category = { 'id': item_category[0].id, 'name': item_category[0].name }
+            //   }
+            // }
 
           }
 
@@ -360,7 +363,7 @@
             const ref = this.$fireStore.collection("item_types").add(
               {
                 name: this.post.item,
-                item_category_id: this.post.item_category
+                //item_category_id: this.post.item_category
               }
             ).then (
               () => {
@@ -412,10 +415,14 @@
             return false;
           }          
 
+          let subject;
+
+          if ( this.post_type == 'good' ) {
+            this.post.subject = this.item.name;
+          }
+
           let doc_record = {
-            email: this.post.email,
             address: this.post.address,
-            name: this.post.name,
             notes: this.post.notes,
             quantity: this.post.quantity,
             coordinates: new this.$fireStoreObj.GeoPoint(addressInfo.latitude, addressInfo.longitude),

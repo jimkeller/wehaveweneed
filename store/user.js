@@ -1,3 +1,4 @@
+import { GeoFirestore } from 'geofirestore'
 
 export const state = () => ({
 	'uid': null,
@@ -15,18 +16,23 @@ export const mutations = {
 	    state.uid = authUser.uid;
 	    state.email = authUser.email;
       state.emailVerified = authUser.emailVerified;
-      
-      let udata = await this.$fireStore.collection('user_data').doc(state.uid).get();
-      
-      if(!udata.exists) {
-        this.$router.push('/configure');
-        return
-      }
 
-      udata = udata.data();
+			const userCollection = new GeoFirestore(this.$fireStore).collection('user_data')
 
-      state.address = udata.address;
-      console.log("Saved address: " + udata.address)
+			let user_doc = await userCollection.doc(authUser.uid);
+			let user_result = await user_doc.get();
+
+      if( user_result.exists ) {
+   
+      	let user_data = user_result.data();
+      	
+         if ( typeof(user_data.address) != 'undefined' && user_data.address ) {
+          
+    			console.log('user address data', user_data.address);
+      
+      		state.address = user_data.address;   	      	
+	      }
+	    }
     }
     
     
@@ -36,3 +42,5 @@ export const mutations = {
     // state.user = { uid, email, emailVerified }
   }
 }
+
+
