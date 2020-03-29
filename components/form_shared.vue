@@ -417,7 +417,7 @@
             return false;
           }          
 
-          if ( this.post_type == 'good' ) {
+          if ( this.post.offering_type == 'good' ) {
             this.post.subject = item_name;
           }
 
