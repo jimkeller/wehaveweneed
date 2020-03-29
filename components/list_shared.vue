@@ -173,20 +173,8 @@
 
       let result;
       if(this.address) {
-        let addressInfo;
+        const addressInfo = await location.lookup(this.address)
 
-        if(this.address.startsWith("coords:")) {
-          const data = this.address.substring("coords:".length).trim();
-          const latitude = Number(data.split(",")[0]);
-          const longitude = Number(data.split(",")[1]);
-
-          addressInfo = {
-            latitude,
-            longitude
-          }
-        } else {
-          addressInfo = await location.lookup(this.address)
-        }
         result = await geoCollection
           .near({
             center: new this.$fireStoreObj.GeoPoint(
@@ -261,6 +249,8 @@
       navigator.geolocation.getCurrentPosition(geoData => {
         this.address = "coords: " + geoData.coords.latitude + ", " + geoData.coords.longitude;
       });
+    } else {
+      if(this.$store.state.user.address) this.address = this.$store.state.user.address.formatted
     }
   }
 }

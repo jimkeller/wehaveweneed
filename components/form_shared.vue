@@ -84,7 +84,7 @@
                 ref="address"
                 v-model="post.address"
                 :rules="addressRules"
-                label="Zip"
+                label="Address"
                 required
                 placeholder="79938"
                 append-icon="mdi-map-marker"
@@ -228,8 +228,7 @@
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
       ],
       addressRules:[
-        v => !!v || 'Zip code is required',
-        v => !isNaN(v) || 'Zip code must be numeric'
+        v => !!v || 'Address is required',
       ],    
       items: [],
       item_categories: [],
@@ -472,6 +471,14 @@
       this.initForm();      
     },
     mounted() {
+      if(this.$store.state.user.uid === null) {
+        // Populate search with current geolocation data
+        navigator.geolocation.getCurrentPosition(geoData => {
+          this.post.address = "coords: " + geoData.coords.latitude + ", " + geoData.coords.longitude;
+        });
+      } else {
+        if(this.$store.state.user.address) this.post.address = this.$store.state.user.address.formatted
+      }
 
       if ( !this.$store.state.user || !this.$store.state.user.uid ) {
 
