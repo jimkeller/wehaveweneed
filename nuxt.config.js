@@ -52,10 +52,10 @@ export default {
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
     '@nuxtjs/firebase',      
-    // ['nuxt-gmaps', {
-    //   key: 'AIzaSyANiHf3C8EswR7HWLENDuAVmxr06okgp6c',
-    //   //you can use libraries: ['places']
-    // }]  
+    ['nuxt-gmaps', {
+      key: 'AIzaSyANiHf3C8EswR7HWLENDuAVmxr06okgp6c',
+      //you can use libraries: ['places']
+    }]  
   ],
   firebase: {
     config: {

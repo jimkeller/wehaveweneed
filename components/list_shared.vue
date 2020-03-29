@@ -21,7 +21,11 @@
             class="elevation-1"
             item-key="id"
             show-expand
+            single-expand
             :search="search"
+            @item-expanded="onExpand"
+            @click:row="rowClicked"
+            :expanded.sync="expanded"
           >
             <template v-slot:top>
               <v-text-field
@@ -35,7 +39,7 @@
                     <v-text-field
                       ref="address"
                       v-model="address"
-                      label="Address"
+                      label="Zip Code"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
@@ -69,8 +73,52 @@
             </template>
 
             <template v-slot:expanded-item="{ headers, item }">
-              <td :colspan="headers.length">
-                {{ item.notes }}
+              <td :colspan="headers.length" class="blue-grey lighten-4">
+                <v-container class="pa-10 ">
+                  <v-row>
+                    <v-col v-if="item.coordinates">
+                      <GMap
+                        v-if="mounted"
+                        ref="gMap"
+                        :center="{lat: item.coordinates.latitude, lng: item.coordinates.longitude}"
+                        :options="{fullscreenControl: false, streetViewControl: false, mapTypeControl: false, zoomControl: true, gestureHandling: 'cooperative' }"
+                        :zoom="6"                        
+                      >
+                        <GMapMarker
+                          :position="{lat: item.coordinates.latitude, lng: item.coordinates.longitude}"
+                        >
+
+                        </GMapMarker>
+                      </GMap>
+                    </v-col>
+                    <v-col>
+                      <v-card>
+                        <v-card-text class="pb-0">{{ item.notes }}</v-card-text>
+                        <v-card-text v-if="item.quantity">Quantity: {{ item.quantity }}</v-card-text>
+                        <v-card-title class="subhead">Contact this person</v-card-title>
+                        <v-card-text>
+                          <v-textarea
+                            v-model="item.email_message"
+                            name="input-email-message"
+                            label="Message"
+                            value=""
+                            hint=""
+                            outlined
+                          ></v-textarea>
+
+                          <v-btn
+                            color="success"
+                            class="mr-4"
+                            @click="sendEmail(item)"
+                            :disabled="!item.email_message"
+                          >
+                            Submit
+                          </v-btn>
+                        </v-card-text>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-container>
               </td>
             </template>
           </v-data-table>
@@ -87,6 +135,8 @@
   export default {
     props: ['postType'],
     data: () => ({
+      expanded: [],
+      mounted: false,
       valid: true,
       dialog: false,
       message: '',
@@ -102,18 +152,8 @@
           sortable: false,
           value: 'item',
         },
-        { text: 'Name', value: 'name' },
-        { text: 'Email', value: 'email' },
-        { text: 'Quantity', value: 'quantity' },
         { text: 'Status', value: 'status' },
       ],
-      locations: [
-        {
-          'id': 1,
-          'lat': 40.098,
-          'long': -75.109
-        }
-      ]
     }),
     computed: {
       canFilter: function() {
@@ -134,12 +174,12 @@
 
       let result;
       if(this.address) {
-        const addressInfo = await location.lookup(this.address)
+        let address_geo = await location.lookup(this.address)
         result = await geoCollection
           .near({
             center: new this.$fireStoreObj.GeoPoint(
-              addressInfo.latitude,
-              addressInfo.longitude
+             address_geo.latitude,
+             address_geo.longitude
             ),
             radius: Number(this.dist)*1.609 //input is in miles, call expects km.
           })
@@ -179,10 +219,30 @@
       this.$refs.address.reset()
       this.dist = ''
       this.filter()
+    },
+    onExpand( row ) {
+
+    },
+    rowClicked( row ) {
+      if ( this.expanded.length > 0 ) {
+        let cur_expanded = this.expanded[0];
+        if ( cur_expanded.id == row.id ) {
+          this.expanded = [];
+          return;
+        }
+      }
+      
+      this.expanded = [ row ];
+    },
+    sendEmail( item ) {
+      console.log('send email for item');
     }
   },
   created() {
     this.fetchData();
+  },
+  mounted() {
+    this.mounted = true;
   }
 }
 </script>
