@@ -92,7 +92,7 @@
       message: '',
       search: '',
       address: '',
-      dist: '',
+      dist: 5,
       distRules: [v => !isNaN(v) || 'Distance must be a number'],
       items: [],
       headers: [
