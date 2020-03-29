@@ -17,6 +17,17 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="dialog_success" persistent max-width="400">
+      <v-card>
+        <v-card-title class="headline">Profile Updated</v-card-title>
+        <v-card-text>Your profile information has been successfully updated.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="dialog_success = false">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-container>
       <v-card>
         <v-card-text>
@@ -97,6 +108,7 @@
       error: '',
       address: '',
       dialog: '',
+      dialog_success: false,
       notify: false,
       notify_miles: 10,
       google: null,
@@ -174,6 +186,8 @@
 
               }
             );
+          
+          this.dialog_success = true;
         } catch (e) {
           throw e;
         }
