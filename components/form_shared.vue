@@ -256,7 +256,7 @@
     }),
     computed: {
       filteredItems() {
-        return this.items.filter(o => o.item_category_id == this.post.item_category && typeof o.name === "string");
+        return this.items.filter(o => o.item_category_id == this.post.item_category);
       }
     },  
     methods: {
@@ -288,11 +288,17 @@
         result = await this.$fireStore.collection('item_types').get().catch( (error) => { this.handleFirebaseError(error) } );
         snapshot = result.docs;
 
-        snapshot.forEach(
-          (doc) => {
-           this.items.push( doc.data() );
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if(typeof data.name === "string") {
+            const capitalize = function(lower) {
+              return (lower ? lower.toLowerCase() : lower).replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+            };
+            data.name = capitalize(data.name);
+
+            this.items.push(data);
           }
-        );
+        });
 
         //
         // If this is an edit, get the post
