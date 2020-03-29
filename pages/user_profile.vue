@@ -110,7 +110,7 @@
 
           let user_record = {};
 
-          if ( change_address ) {
+          if ( this.change_address ) {
 
             if ( !this.autocomplete || typeof(this.autocomplete.getPlace) == 'undefined' ) {
               this.error = 'Error loading address autocomplete'
