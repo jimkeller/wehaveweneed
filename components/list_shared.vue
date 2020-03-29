@@ -255,10 +255,13 @@
   },
   mounted() {
     this.mounted = true;
-    // Populate search with current geolocation data
-    navigator.geolocation.getCurrentPosition(geoData => {
-      this.address = "coords: " + geoData.coords.latitude + ", " + geoData.coords.longitude;
-    });
+
+    if(this.$store.state.user.uid === null) {
+      // Populate search with current geolocation data
+      navigator.geolocation.getCurrentPosition(geoData => {
+        this.address = "coords: " + geoData.coords.latitude + ", " + geoData.coords.longitude;
+      });
+    }
   }
 }
 </script>
