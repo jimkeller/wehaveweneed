@@ -254,7 +254,7 @@
     }),
     computed: {
       filteredItems() {
-        return this.items.filter(o =>  o.item_category_id == this.post.item_category);
+        return this.items.filter(o => o.item_category_id == this.post.item_category && typeof o.name === "string");
       }
     },  
     methods: {

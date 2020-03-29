@@ -142,7 +142,7 @@
       message: '',
       search: '',
       address: '',
-      dist: '',
+      dist: 5,
       distRules: [v => !isNaN(v) || 'Distance must be a number'],
       items: [],
       headers: [
@@ -174,12 +174,25 @@
 
       let result;
       if(this.address) {
-        let address_geo = await location.lookup(this.address)
+        let addressInfo;
+
+        if(this.address.startsWith("coords:")) {
+          const data = this.address.substring("coords:".length).trim();
+          const latitude = Number(data.split(",")[0]);
+          const longitude = Number(data.split(",")[1]);
+
+          addressInfo = {
+            latitude,
+            longitude
+          }
+        } else {
+          addressInfo = await location.lookup(this.address)
+        }
         result = await geoCollection
           .near({
             center: new this.$fireStoreObj.GeoPoint(
-             address_geo.latitude,
-             address_geo.longitude
+              addressInfo.latitude,
+              addressInfo.longitude
             ),
             radius: Number(this.dist)*1.609 //input is in miles, call expects km.
           })
@@ -243,6 +256,10 @@
   },
   mounted() {
     this.mounted = true;
+    // Populate search with current geolocation data
+    navigator.geolocation.getCurrentPosition(geoData => {
+      this.address = "coords: " + geoData.coords.latitude + ", " + geoData.coords.longitude;
+    });
   }
 }
 </script>
