@@ -1,17 +1,26 @@
 import { GeoFirestore } from 'geofirestore'
 
-export const state = () => ({
-	'uid': null,
-  'email': null,
-  'emailVerified': null,
-  foo: ''
-})
+export const state = () => {
+  return {
+    'uid': null,
+    'email': null,
+    'emailVerified': null,
+    foo: ''
+  }
+}
 
 export const mutations = {
   ON_AUTH_STATE_CHANGED_MUTATION: async function (state, { authUser, claims }) {
     
     console.log("AUTH STATE MUTATION");
-    // Do this:
+    console.log(state.uid)
+
+    const cache = localStorage.getItem("user");
+    if(cache) {
+      const cached_data = JSON.parse(cache);
+      state.address = cached_data.address;
+    }
+
     if ( authUser ) {
 	    state.uid = authUser.uid;
 	    state.email = authUser.email;
@@ -32,14 +41,10 @@ export const mutations = {
       
       		state.address = user_data.address;   	      	
 	      }
-	    }
+      }
+      
+      localStorage.setItem("user", JSON.stringify(state));
     }
-    
-    
-    // Or this:
-    
-    // const { uid, email, emailVerified } = authUser
-    // state.user = { uid, email, emailVerified }
   }
 }
 

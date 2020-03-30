@@ -477,6 +477,7 @@
       this.initForm();      
     },
     mounted() {
+      console.log(this.$store.state.uid)
       if(this.$store.state.user.uid === null) {
         // Populate search with current geolocation data
         navigator.geolocation.getCurrentPosition(geoData => {
