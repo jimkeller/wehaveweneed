@@ -35,7 +35,7 @@
               ></v-text-field>
               <v-container fluid>
                 <v-row>
-                  <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
+                  <v-col cols="12"  md="6">
                     <v-text-field
                       ref="address"
                       v-model="address"
@@ -45,7 +45,7 @@
                       id="address_autocomplete"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
+                  <v-col cols="4" md="6">
                     <v-select
                       ref="dist"
                       v-model="dist"
@@ -67,7 +67,7 @@
                     </v-btn>
                   </v-col>
                   <v-col cols="3" lg="cols[n - 1]" md="6" sm="cols[n - 1]">
-                    <v-btn color="success" class="mr-4" @click="clearFilter">
+                    <v-btn class="mr-4" @click="clearFilter">
                       Reset
                     </v-btn>
                   </v-col>
@@ -79,7 +79,7 @@
               <td :colspan="headers.length" class="blue-grey lighten-4">
                 <v-container class="pa-10 ">
                   <v-row>
-                    <v-col v-if="item.coordinates">
+                    <v-col cols="12" md="6" v-if="item.coordinates">
                       <GMap
                         v-if="mounted"
                         ref="gMap"
@@ -94,7 +94,7 @@
                         </GMapMarker>
                       </GMap>
                     </v-col>
-                    <v-col>
+                    <v-col cols="12" md="6" >
                       <v-card>
                         <v-card-text class="pb-0">{{ item.notes }}</v-card-text>
                         <v-card-text v-if="item.quantity">Quantity: {{ item.quantity }}</v-card-text>
