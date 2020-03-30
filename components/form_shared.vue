@@ -86,8 +86,10 @@
                 :rules="addressRules"
                 label="Address"
                 required
-                placeholder="79938"
+                placeholder=""
                 append-icon="mdi-map-marker"
+                id="address_autocomplete"
+                @keydown="addressKeyPress"
               ></v-text-field>
 
             <header class="pa-0" v-if="postType=='have'">I am offering:</header>
@@ -194,6 +196,7 @@
         </v-col>
       </v-row>
     </v-container>
+    <GMap v-show="false">Necessary to get the GMap module to load</GMap>
   </v-container>
 </template>
 
@@ -201,7 +204,6 @@
 
   import { GeoFirestore } from 'geofirestore'
   import { v4 as uuidv4 } from 'uuid';
-  import * as location from './util/location';
   import firebase from 'firebase/app';
 
   export default {
@@ -218,6 +220,8 @@
       valid: true,
       dialog: false,
       dialog_success: false,
+      address_coords: null,
+      google: null,
       message: '',
       post_statuses: [ 'New', 'Matched', 'Cancelled' ],
       nameRules: [
@@ -314,6 +318,7 @@
           if ( snapshot.length > 0 ) {
             let doc_data = snapshot[0].data();
             
+            this.address_coords = { 'lat': doc_data.coordinates.latitude, 'lng': doc_data.coordinates.longitude }
             //
             // @TODO - this should be dynamic rather than having every field listed
             //
@@ -411,16 +416,47 @@
             //
             // Generate a UUID for this post
             //
-            this.post.uuid = uuidv4();
+            this.post.uuid = uuidv4();            
             doc_ref = geoCollection.doc();
           }
 
-          const addressInfo = await location.lookup(this.post.address);          
+          //
+          // Determine the address coordinates
+          // 
+          if ( !this.address_coords ) {
 
-          if ( !addressInfo || typeof(addressInfo.latitude) == 'undefined' || !addressInfo.latitude ) {
-            this.handleFirebaseError( { 'message': 'Could not look up address data based on that zip code. Please check the value and try again.'} );
+            if ( !this.address_autocomplete || typeof(this.address_autocomplete.getPlace) == 'undefined' ) {
+              this.error = 'Error loading address autocomplete'
+            }
+
+            let place = await this.address_autocomplete.getPlace();
+
+            if ( !place || typeof(place.geometry) == 'undefined' || !place.geometry ) {
+              this.error = 'Error finding that address. Please try again';
+            }
+
+
+            this.address_coords = { 'lat': place.geometry.location.lat(), 'lng': place.geometry.location.lng() }
+            this.post.address = place.formatted_address;
+          }     
+
+          //
+          // Check again to see if address coords were pulled from autocomplete
+          //
+          if ( !this.address_coords ) {
+            this.error = 'Error finding that address. Please try again';
+          }
+
+          if ( this.error ) {
+            this.dialog = true;
             return false;
-          }          
+          }
+
+          console.log('address coords', this.address_coords); 
+
+          //
+          // Set up the post record
+          //
 
           if ( this.post.offering_type == 'good' ) {
             this.post.subject = item_name;
@@ -430,7 +466,7 @@
             address: this.post.address,
             notes: this.post.notes,
             quantity: this.post.quantity,
-            coordinates: new this.$fireStoreObj.GeoPoint(addressInfo.latitude, addressInfo.longitude),
+            coordinates: new this.$fireStoreObj.GeoPoint(this.address_coords.lat, this.address_coords.lng),
             uuid: this.post.uuid,
             type: this.post.type,
             status: this.post.status,
@@ -472,21 +508,20 @@
       resetValidation () {
         this.$refs.form.resetValidation()
       },
+      addressKeyPress() {
+        this.address_coords = null;
+        this.address = '';
+      }
+
     },
     created () {
       this.initForm();      
     },
-    mounted() {
-      console.log(this.$store.state.uid)
-      if(this.$store.state.user.uid === null) {
-        // Populate search with current geolocation data
-        navigator.geolocation.getCurrentPosition(geoData => {
-          this.post.address = "coords: " + geoData.coords.latitude + ", " + geoData.coords.longitude;
-        });
-      } else {
-        if(this.$store.state.user.address) this.post.address = this.$store.state.user.address.formatted
-      }
+    async mounted() {
 
+      //
+      // Set up auth/login
+      //
       if ( !this.$store.state.user || !this.$store.state.user.uid ) {
 
         var firebaseui = require('firebaseui');
@@ -519,10 +554,34 @@
           }
         };
         
-        ui.start("#firebaseui-auth-container", uiConfig);    
+        ui.start("#firebaseui-auth-container", uiConfig);   
+
       }
 
+      //
+      // Setup address coordinates & google autocomplete
+      //
+      if ( typeof(this.$store.state.user) != 'undefined' && typeof(this.$store.state.user.address) != 'undefined' && typeof(this.$store.state.user.address.lat) != 'undefined' ) {
+        if ( this.$store.state.user.address.lat && this.$store.state.user.address.lng ) {          
+         this.address_coords = { lat: this.$store.state.user.address.lat, lng: this.$store.state.user.address.lng };
+         this.post.address = this.$store.state.user.address.formatted;
+        }
+      }
+      else {
+        navigator.geolocation.getCurrentPosition(geoData => {
+          if ( typeof(geoData.coords) != 'undefined' ) {
+            this.address_coords = { lat: geoData.coords.latitude, lng: geoData.coords.longitude };
+            this.post.address = '(Your current location) Latitude: ' + this.address_coords.lat.toString() + ' Longitude: ' + this.address_coords.lng.toString();
+          }
+        });          
+      }
 
+      this.google = await this.$GMaps.google;
+      this.address_autocomplete = new this.google.maps.places.Autocomplete(
+        document.getElementById('address_autocomplete'),  {}
+      );
+
+      console.log('loaded address coords', this.address_coords);
     }
 
 

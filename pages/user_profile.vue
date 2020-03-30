@@ -128,13 +128,15 @@
               this.error = 'Error loading address autocomplete'
             }
 
-            let place = this.autocomplete.getPlace();
+            let place = await this.autocomplete.getPlace();
+           
+            console.log('place', place); 
 
-            
-
-            if ( !place.geometry ) {
+            if ( !place || typeof(place.geometry) == 'undefined' || !place.geometry ) {
               this.error = 'Error finding that address. Please try again';
             }
+
+            console.log('ok');
 
             if ( this.error ) {
               this.dialog = true;
@@ -215,8 +217,24 @@
       if ( this.$store.state.user && typeof(this.$store.state.user.address) != 'undefined' && typeof(this.$store.state.user.address.formatted) != 'undefined' ) {
           this.stored_address = this.$store.state.user.address.formatted;
           this.change_address = false;
-          console.log('no change address');          
+          // console.log('no change address');          
+
+          
+          // let placeRequest = { placeId: this.$store.state.user.address.id };
+          // console.log('placeRequest', placeRequest );
+          // console.log('refsmap', this.$refs.map );
+        //   let placeService = new this.google.maps.places.PlacesService('gmap_ref');
+        //   placeService.getDetails(placeRequest, (placeResult, placeServiceStatus) => {
+        //     console.log('placeService :: placeResult = ', placeResult, '\n',
+        //     'placeServiceStatus = ', placeServiceStatus);
+
+        //   this._handlePlaceChange(placeResult);
+
+        // });
+
+
       }
+
 
       // console.log('stored address', this.$store.state.user.address);
 
@@ -235,7 +253,7 @@
       //   });
 
       // }
-
+      console.log('autocomplete init');
       this.autocomplete = new this.google.maps.places.Autocomplete(
         document.getElementById('address_autocomplete'),  {}
       );
