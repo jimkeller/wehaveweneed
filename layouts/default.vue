@@ -131,6 +131,20 @@ export default {
       appTitle: 'We Have / We Need'
     }
   },
+  head () {
+
+    let site_image = 'https://wehaveweneed.com/assets/wehaveweneed-home.jpg'; //require('~/assets/wehaveweneed-home.jpg');
+
+    return {            
+
+      title: this.title,
+      meta: [
+        // hid is used as unique identifier. Do not use `vmid` for it as it will not work
+        { hid: 'og-image-default', name: 'og:image', content: site_image },
+        { hid: 'twitter-image-default', name: 'twitter:image', content: site_image },
+      ]
+    }
+  },
   methods: {
     async userSignOut() {
       await this.$fireAuth.signOut().catch(function(error) {
