@@ -22,6 +22,9 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
+  serverMiddleware: [
+    { path: '/api', handler: '~/api/index.js' }
+  ],
   /*
   ** Customize the progress-bar color
   */
