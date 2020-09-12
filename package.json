@@ -19,7 +19,7 @@
     "firebase-admin": "^8.10.0",
     "firebaseui": "^4.5.0",
     "geofirestore": "^3.4.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "nuxt": "^2.0.0",
     "nuxt-gmaps": "^1.1.9",
     "uuid": "^7.0.2",
